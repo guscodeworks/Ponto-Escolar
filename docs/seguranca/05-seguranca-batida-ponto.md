@@ -20,7 +20,7 @@
 - src/middlewares/authMiddleware.js
 - src/utils/location.js
 - src/middlewares/validators.js
-- ponto.sql
+- database/schema/ponto.sql
 
 ## Integridade e concorrencia
 

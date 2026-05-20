@@ -1,12 +1,6 @@
-const { execute, executeOne } = require('../config/database');
+const crypto = require('crypto');
 const env = require('../config/env');
-const {
-  generateSecureToken,
-  hashToken,
-  isTokenExpired,
-  isValidTokenFormat,
-  tokenFingerprint
-} = require('../utils/token');
+const { isValidTokenFormat } = require('../utils/token');
 
 const QR_CONTEXT = 'BATIDA_PONTO';
 const SAO_PAULO_TIMEZONE = 'America/Sao_Paulo';
@@ -33,6 +27,11 @@ function getSaoPauloDateParts(referenceDate = new Date()) {
   };
 }
 
+function getSaoPauloDayKey(referenceDate = new Date()) {
+  const { year, month, day } = getSaoPauloDateParts(referenceDate);
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+
 function getNextSaoPauloMidnight(referenceDate = new Date()) {
   const { year, month, day } = getSaoPauloDateParts(referenceDate);
   return new Date(Date.UTC(year, month - 1, day + 1, 3, 0, 0, 0));
@@ -47,6 +46,26 @@ function getUnitCode(unidadeCodigo = env.SCHOOL_UNIT_CODE) {
   return normalized || 'DEFAULT';
 }
 
+function getDailyToken({ unidadeCodigo = env.SCHOOL_UNIT_CODE, referenceDate = new Date() } = {}) {
+  const unitCode = getUnitCode(unidadeCodigo);
+  const dayKey = getSaoPauloDayKey(referenceDate);
+  const payload = `${dayKey}:${unitCode}`;
+  return crypto.createHmac('sha256', env.JWT_SECRET).update(payload).digest('hex');
+}
+
+function isSameToken(candidate, expected) {
+  if (!isValidTokenFormat(candidate) || !isValidTokenFormat(expected)) {
+    return false;
+  }
+
+  const left = Buffer.from(candidate, 'hex');
+  const right = Buffer.from(expected, 'hex');
+  if (left.length !== right.length) {
+    return false;
+  }
+  return crypto.timingSafeEqual(left, right);
+}
+
 function mapQrCode(row, includeSecret = false) {
   if (!row) {
     return null;
@@ -57,85 +76,55 @@ function mapQrCode(row, includeSecret = false) {
     token_hint: row.token_hint,
     contexto: row.contexto,
     unidade_codigo: row.unidade_codigo,
-    ativo: Boolean(row.ativo),
+    ativo: true,
     valido_de: row.valido_de,
     expira_em: row.expira_em,
     criado_em: row.criado_em,
-    desativado_em: row.desativado_em,
+    desativado_em: null,
     ...(includeSecret ? { qr_code: row.qr_code, url: row.url } : {})
   };
 }
 
-async function createQrCode({ adminId = null, unidadeCodigo = env.SCHOOL_UNIT_CODE, expiresAt = null, baseUrl = '' } = {}) {
-  const qrCode = generateSecureToken();
-  const qrCodeHash = hashToken(qrCode);
-  const unitCode = getUnitCode(unidadeCodigo);
-  const expirationDate = expiresAt instanceof Date ? expiresAt : getNextSaoPauloMidnight();
-  const tokenHint = tokenFingerprint(qrCode);
-
-  const result = await execute(
-    `INSERT INTO qr_codes (codigo_hash, token_hint, contexto, unidade_codigo, ativo, valido_de, expira_em, criado_por_admin_id)
-     VALUES (?, ?, ?, ?, 1, UTC_TIMESTAMP(), ?, ?)`,
-    [qrCodeHash, tokenHint, QR_CONTEXT, unitCode, toMysqlDateTime(expirationDate), adminId]
-  );
-
-  const row = await executeOne(
-    `SELECT id, token_hint, contexto, unidade_codigo, ativo, valido_de, expira_em, criado_em, desativado_em
-     FROM qr_codes
-     WHERE id = ?
-     LIMIT 1`,
-    [result.insertId]
-  );
-
+function buildDailyQrPayload({ unidadeCodigo = env.SCHOOL_UNIT_CODE, baseUrl = '', referenceDate = new Date() } = {}) {
+  const qrCode = getDailyToken({ unidadeCodigo, referenceDate });
+  const dayKey = getSaoPauloDayKey(referenceDate);
+  const id = Number(dayKey.replace(/-/g, ''));
+  const now = referenceDate;
+  const expirationDate = getNextSaoPauloMidnight(referenceDate);
   const path = `/ponto/acessar?qr_code=${qrCode}`;
-  return mapQrCode(
-    {
-      ...row,
-      qr_code: qrCode,
-      url: baseUrl ? `${baseUrl.replace(/\/$/, '')}${path}` : path
-    },
-    true
-  );
+
+  return {
+    id,
+    token_hint: qrCode.slice(0, 12),
+    contexto: QR_CONTEXT,
+    unidade_codigo: getUnitCode(unidadeCodigo),
+    valido_de: toMysqlDateTime(now),
+    expira_em: toMysqlDateTime(expirationDate),
+    criado_em: toMysqlDateTime(now),
+    qr_code: qrCode,
+    url: baseUrl ? `${baseUrl.replace(/\/$/, '')}${path}` : path
+  };
+}
+
+async function createQrCode({ unidadeCodigo = env.SCHOOL_UNIT_CODE, baseUrl = '' } = {}) {
+  const payload = buildDailyQrPayload({ unidadeCodigo, baseUrl, referenceDate: new Date() });
+  return mapQrCode(payload, true);
 }
 
 async function listQrCodes({ page = 1, limit = 20 } = {}) {
   const safePage = Math.max(Number(page || 1), 1);
   const safeLimit = Math.min(Math.max(Number(limit || 20), 1), 100);
-  const offset = (safePage - 1) * safeLimit;
-
-  const totalRows = await executeOne('SELECT COUNT(*) AS total FROM qr_codes');
-  const rows = await execute(
-    `SELECT id, token_hint, contexto, unidade_codigo, ativo, valido_de, expira_em, criado_em, desativado_em
-     FROM qr_codes
-     ORDER BY criado_em DESC
-     LIMIT ? OFFSET ?`,
-    [safeLimit, offset]
-  );
+  const payload = buildDailyQrPayload({ referenceDate: new Date() });
+  const items = safePage === 1 && safeLimit > 0 ? [mapQrCode(payload)] : [];
 
   return {
-    items: rows.map((row) => mapQrCode(row)),
+    items,
     pagination: {
       page: safePage,
       limit: safeLimit,
-      total: Number(totalRows?.total || 0)
+      total: 1
     }
   };
-}
-
-function getQrCodeStatus(row, unidadeCodigo = env.SCHOOL_UNIT_CODE) {
-  if (!row) {
-    return 'inexistente';
-  }
-  if (!row.ativo) {
-    return 'inativo';
-  }
-  if (isTokenExpired(row.expira_em)) {
-    return 'expirado';
-  }
-  if (getUnitCode(row.unidade_codigo) !== getUnitCode(unidadeCodigo)) {
-    return 'unidade_invalida';
-  }
-  return 'valido';
 }
 
 async function validateQrCode(qrCode, { unidadeCodigo = env.SCHOOL_UNIT_CODE } = {}) {
@@ -147,56 +136,18 @@ async function validateQrCode(qrCode, { unidadeCodigo = env.SCHOOL_UNIT_CODE } =
     };
   }
 
-  const qrCodeHash = hashToken(qrCode);
-  const row = await executeOne(
-    `SELECT id, codigo_hash, token_hint, contexto, unidade_codigo, ativo, valido_de, expira_em, criado_em, desativado_em
-     FROM qr_codes
-     WHERE codigo_hash = ?
-     LIMIT 1`,
-    [qrCodeHash]
-  );
-  const status = getQrCodeStatus(row, unidadeCodigo);
+  const payload = buildDailyQrPayload({ unidadeCodigo, referenceDate: new Date() });
+  const isValid = isSameToken(qrCode, payload.qr_code);
 
   return {
-    valid: status === 'valido',
-    status,
-    qrCode: status === 'valido' ? mapQrCode(row) : null,
-    qrCodeHash
+    valid: isValid,
+    status: isValid ? 'valido' : 'invalido_ou_expirado',
+    qrCode: isValid ? mapQrCode(payload) : null
   };
 }
 
-async function validateQrCodeById(id, qrCodeHash, { unidadeCodigo = env.SCHOOL_UNIT_CODE } = {}) {
-  const qrId = Number(id);
-  if (!Number.isInteger(qrId) || qrId <= 0 || typeof qrCodeHash !== 'string') {
-    return {
-      valid: false,
-      status: 'inexistente',
-      qrCode: null
-    };
-  }
-
-  const row = await executeOne(
-    `SELECT id, codigo_hash, token_hint, contexto, unidade_codigo, ativo, valido_de, expira_em, criado_em, desativado_em
-     FROM qr_codes
-     WHERE id = ? AND codigo_hash = ?
-     LIMIT 1`,
-    [qrId, qrCodeHash]
-  );
-  const status = getQrCodeStatus(row, unidadeCodigo);
-
-  return {
-    valid: status === 'valido',
-    status,
-    qrCode: status === 'valido' ? mapQrCode(row) : null
-  };
-}
-
-async function deactivateQrCode(id) {
-  const result = await execute(
-    'UPDATE qr_codes SET ativo = 0, desativado_em = UTC_TIMESTAMP() WHERE id = ? AND ativo = 1',
-    [Number(id)]
-  );
-  return result.affectedRows > 0;
+async function deactivateQrCode(_id) {
+  return false;
 }
 
 module.exports = {
@@ -204,7 +155,7 @@ module.exports = {
   createQrCode,
   listQrCodes,
   validateQrCode,
-  validateQrCodeById,
   deactivateQrCode,
-  mapQrCode
+  mapQrCode,
+  getDailyToken
 };

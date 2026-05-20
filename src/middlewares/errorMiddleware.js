@@ -31,6 +31,22 @@ function errorMiddleware(error, req, res, next) {
     return next(error);
   }
 
+  logger.error('Raw request error', {
+    method: req.method,
+    path: req.originalUrl,
+    ip: req.ip,
+    userId: req.auth?.id || null,
+    error: {
+      name: error?.name || null,
+      code: error?.code || null,
+      status: error?.status || null,
+      statusCode: error?.statusCode || null,
+      message: error?.message || null,
+      stack: error?.stack || null,
+      cause: error?.cause || null
+    }
+  });
+
   const normalized = normalizeError(error);
   const safeError =
     normalized instanceof AppError

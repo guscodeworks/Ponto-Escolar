@@ -10,7 +10,7 @@
 
 - src/services/auditLogService.js
 - src/utils/logger.js
-- ponto.sql
+- database/schema/ponto.sql
 
 ## Eventos cobertos
 

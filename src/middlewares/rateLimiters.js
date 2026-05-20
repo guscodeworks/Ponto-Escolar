@@ -40,7 +40,7 @@ function createLimiter(options) {
 }
 
 function isPunchRegistrationRequest(req) {
-  return req.method === 'POST' && /^\/(api\/pontos|ponto)\/(validar-qr|login|registrar|bater)\/?$/.test(req.path);
+  return req.method === 'POST' && /^\/(api\/pontos|ponto)\/(login|registrar|bater)\/?$/.test(req.path);
 }
 
 const globalLimiter = createLimiter({

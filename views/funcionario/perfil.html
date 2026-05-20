@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Meu Perfil — Sala do Futuro</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%231251a3'/><text y='22' x='5' font-size='18'>🏫</text></svg>"/>
+  <link rel="icon" href="/assets/img/favicon.svg"/>
   <link rel="stylesheet" href="/assets/css/funcionario.css"/>
 </head>
 <body>
@@ -33,15 +33,15 @@
 
     <nav class="sidebar-nav">
       <div class="sidebar-section-label">Principal</div>
-      <a href="/funcionario/ponto.html" class="nav-link">
+      <a href="/funcionario" class="nav-link">
         <span class="nav-icon">⏱</span> Bater Ponto
       </a>
       <div class="sidebar-section-label">Histórico</div>
-      <a href="/funcionario/relatorio.html" class="nav-link">
+      <a href="/funcionario/relatorio" class="nav-link">
         <span class="nav-icon">📊</span> Meus Relatórios
       </a>
       <div class="sidebar-section-label">Conta</div>
-      <a href="/funcionario/perfil.html" class="nav-link active">
+      <a href="/funcionario/perfil" class="nav-link active">
         <span class="nav-icon">👤</span> Meu Perfil
       </a>
     </nav>
@@ -239,15 +239,15 @@
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <div class="bottom-nav-inner">
-    <a href="/funcionario/ponto.html" class="bottom-nav-link">
+    <a href="/funcionario" class="bottom-nav-link">
       <span class="bottom-nav-icon">⏱</span>
       <span>Ponto</span>
     </a>
-    <a href="/funcionario/relatorio.html" class="bottom-nav-link">
+    <a href="/funcionario/relatorio" class="bottom-nav-link">
       <span class="bottom-nav-icon">📊</span>
       <span>Relatório</span>
     </a>
-    <a href="/funcionario/perfil.html" class="bottom-nav-link active">
+    <a href="/funcionario/perfil" class="bottom-nav-link active">
       <span class="bottom-nav-icon">👤</span>
       <span>Perfil</span>
     </a>
@@ -374,7 +374,7 @@ function toast(msg, tipo='info') {
 
 function sair() {
   sessionStorage.clear();
-  window.location.href = '/funcionario/login.html';
+  window.location.href = '/login';
 }
 
 // Grid responsivo no perfil
@@ -387,3 +387,5 @@ checkCols();
 </script>
 </body>
 </html>
+
+

@@ -66,16 +66,16 @@ async function main() {
       return;
     }
 
-    const sqlFilePath = path.resolve(__dirname, '../../ponto.sql');
+    const sqlFilePath = path.resolve(__dirname, '../../database/schema/ponto.sql');
     if (!fs.existsSync(sqlFilePath)) {
-      console.error('[initDatabase] Arquivo ponto.sql nao encontrado.');
+      console.error('[initDatabase] Arquivo database/schema/ponto.sql nao encontrado.');
       process.exitCode = 1;
       return;
     }
 
     const schemaSql = fs.readFileSync(sqlFilePath, 'utf8').replace(/^\uFEFF/, '').trim();
     if (!schemaSql) {
-      console.error('[initDatabase] ponto.sql esta vazio.');
+      console.error('[initDatabase] database/schema/ponto.sql esta vazio.');
       process.exitCode = 1;
       return;
     }

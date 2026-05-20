@@ -3,7 +3,7 @@
 ## Backend
 
 - server.js
-- config/db.js
+- src/config/legacyDb.js
 - src/app.js
 - src/config/env.js
 - src/config/database.js
@@ -33,7 +33,7 @@
 
 ## Banco e ambiente
 
-- ponto.sql
+- database/schema/ponto.sql
 - .env.example
 
 ## Documentacao

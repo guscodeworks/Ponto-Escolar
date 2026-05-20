@@ -39,7 +39,6 @@ CREATE TABLE IF NOT EXISTS funcionarios (
 CREATE TABLE IF NOT EXISTS registro_de_pontos (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   funcionario_id BIGINT UNSIGNED NOT NULL,
-  qr_code_id BIGINT UNSIGNED NOT NULL,
   data_referencia DATE NOT NULL,
   sequencia TINYINT UNSIGNED NOT NULL,
   tipo ENUM('ENTRADA', 'SAIDA_ALMOCO', 'VOLTA_ALMOCO', 'SAIDA') NOT NULL,
@@ -54,15 +53,10 @@ CREATE TABLE IF NOT EXISTS registro_de_pontos (
   UNIQUE KEY uk_ponto_tipo_unico (funcionario_id, data_referencia, tipo),
   KEY idx_pontos_data_func_seq (data_referencia, funcionario_id, sequencia),
   KEY idx_pontos_tipo (tipo),
-  KEY idx_pontos_qr_code (qr_code_id),
   CONSTRAINT chk_pontos_sequencia CHECK (sequencia BETWEEN 1 AND 4),
   CONSTRAINT chk_pontos_distancia CHECK (distancia_metros >= 0),
   CONSTRAINT fk_pontos_funcionario FOREIGN KEY (funcionario_id)
     REFERENCES funcionarios (id)
-    ON UPDATE CASCADE
-    ON DELETE RESTRICT,
-  CONSTRAINT fk_pontos_qr_code FOREIGN KEY (qr_code_id)
-    REFERENCES qr_codes (id)
     ON UPDATE CASCADE
     ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -1,21 +1,18 @@
 const { Router } = require('express');
 const {
   loginFuncionario,
-  registerPunch,
-  validatePublicQrCode
+  registerPunch
 } = require('../controllers/punchController');
 const { authenticateFuncionario } = require('../middlewares/authMiddleware');
 const { pointLimiter } = require('../middlewares/rateLimiters');
 const {
   baterPontoValidator,
-  funcionarioLoginValidator,
-  validateQrTokenValidator
+  funcionarioLoginValidator
 } = require('../middlewares/validators');
 const { MethodNotAllowedError } = require('../utils/errors');
 
 const router = Router();
 
-router.post('/validar-qr', pointLimiter, validateQrTokenValidator, validatePublicQrCode);
 router.post('/login', pointLimiter, funcionarioLoginValidator, loginFuncionario);
 router.post('/registrar', pointLimiter, authenticateFuncionario, baterPontoValidator, registerPunch);
 router.post('/bater', pointLimiter, authenticateFuncionario, baterPontoValidator, registerPunch);

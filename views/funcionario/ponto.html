@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bater Ponto — Sala do Futuro</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%231251a3'/><text y='22' x='5' font-size='18'>🏫</text></svg>"/>
+  <link rel="icon" href="/assets/img/favicon.svg"/>
   <link rel="stylesheet" href="/assets/css/funcionario.css"/>
 </head>
 <body>
@@ -34,17 +34,17 @@
 
     <nav class="sidebar-nav">
       <div class="sidebar-section-label">Principal</div>
-      <a href="/funcionario/ponto.html" class="nav-link active">
+      <a href="/funcionario" class="nav-link active">
         <span class="nav-icon">⏱</span> Bater Ponto
       </a>
 
       <div class="sidebar-section-label">Histórico</div>
-      <a href="/funcionario/relatorio.html" class="nav-link">
+      <a href="/funcionario/relatorio" class="nav-link">
         <span class="nav-icon">📊</span> Meus Relatórios
       </a>
 
       <div class="sidebar-section-label">Conta</div>
-      <a href="/funcionario/perfil.html" class="nav-link">
+      <a href="/funcionario/perfil" class="nav-link">
         <span class="nav-icon">👤</span> Meu Perfil
       </a>
     </nav>
@@ -74,7 +74,7 @@
           <div class="topbar-time" id="topbar-time">--:--:--</div>
           <div class="topbar-date" id="topbar-date"></div>
         </div>
-        <div class="topbar-user" onclick="window.location.href='/funcionario/perfil.html'">
+        <div class="topbar-user" onclick="window.location.href='/funcionario/perfil'">
           <div class="topbar-avatar" id="tp-avatar">IO</div>
           <div class="topbar-user-info">
             <span class="topbar-user-name" id="tp-name">Isaque</span>
@@ -152,15 +152,15 @@
 <!-- BOTTOM NAV MOBILE -->
 <nav class="bottom-nav">
   <div class="bottom-nav-inner">
-    <a href="/funcionario/ponto.html" class="bottom-nav-link active">
+    <a href="/funcionario" class="bottom-nav-link active">
       <span class="bottom-nav-icon">⏱</span>
       <span>Ponto</span>
     </a>
-    <a href="/funcionario/relatorio.html" class="bottom-nav-link">
+    <a href="/funcionario/relatorio" class="bottom-nav-link">
       <span class="bottom-nav-icon">📊</span>
       <span>Relatório</span>
     </a>
-    <a href="/funcionario/perfil.html" class="bottom-nav-link">
+    <a href="/funcionario/perfil" class="bottom-nav-link">
       <span class="bottom-nav-icon">👤</span>
       <span>Perfil</span>
     </a>
@@ -189,18 +189,18 @@ const funcionarioToken = sessionStorage.getItem('funcionario_token');
 const funcionarioData = JSON.parse(sessionStorage.getItem('funcionario_data') || 'null');
 
 if (!funcionarioToken || !funcionarioData) {
-  window.location.href = '/funcionario/login.html';
+  window.location.href = '/login';
 }
 
-const nome = funcionarioData?.nome || sessionStorage.getItem('func_nome') || 'Funcionario';
-const cargo = funcionarioData?.cargo || sessionStorage.getItem('func_cargo') || 'Funcionario';
+const nome = funcionarioData?.nome || sessionStorage.getItem('func_nome') || 'Funcionário';
+const cargo = funcionarioData?.cargo || sessionStorage.getItem('func_cargo') || 'Funcionário';
 const iniciais = nome.split(' ').filter(Boolean).map(n => n[0]).slice(0, 2).join('').toUpperCase() || 'FN';
 
 document.getElementById('sb-avatar').textContent = iniciais;
 document.getElementById('sb-name').textContent = nome;
 document.getElementById('sb-role').textContent = cargo;
 document.getElementById('tp-avatar').textContent = iniciais;
-document.getElementById('tp-name').textContent = nome.split(' ')[0] || 'Funcionario';
+document.getElementById('tp-name').textContent = nome.split(' ')[0] || 'Funcionário';
 document.getElementById('hero-name').textContent = nome;
 document.getElementById('hero-cargo').textContent = cargo;
 
@@ -224,7 +224,7 @@ async function apiRequest(path, options = {}) {
 function getCurrentLocation() {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
-      reject(new Error('Este aparelho nao permite capturar localizacao.'));
+      reject(new Error('Este aparelho não permite capturar localização.'));
       return;
     }
 
@@ -235,14 +235,14 @@ function getCurrentLocation() {
           longitude: position.coords.longitude
         });
       },
-      () => reject(new Error('Para bater ponto, permita o acesso a localizacao.')),
+      () => reject(new Error('Para bater ponto, permita o acesso à localização.')),
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );
   });
 }
 
-const DIAS_SEMANA = ['Domingo','Segunda-feira','Terca-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sabado'];
-const MESES = ['janeiro','fevereiro','marco','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const DIAS_SEMANA = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+const MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 
 function atualizarRelogio() {
   const now = new Date();
@@ -268,7 +268,7 @@ const SEQUENCIA = [
   { label: 'Registrar\nEntrada', icon: 'ENT', classe: 'entrada', statusTxt: 'Entrada registrada', dotClass: 'active', tlLabel: 'Entrada', tlIcon: 'entrada', tipoApi: 'ENTRADA' },
   { label: 'Registrar\nPausa', icon: 'ALM', classe: 'pausa', statusTxt: 'Em pausa', dotClass: 'paused', tlLabel: 'Pausa', tlIcon: 'pausa', tipoApi: 'SAIDA_ALMOCO' },
   { label: 'Registrar\nRetorno', icon: 'RET', classe: 'retorno', statusTxt: 'De volta ao trabalho', dotClass: 'active', tlLabel: 'Retorno', tlIcon: 'retorno', tipoApi: 'VOLTA_ALMOCO' },
-  { label: 'Registrar\nSaida', icon: 'SAI', classe: 'saida', statusTxt: 'Expediente encerrado', dotClass: 'closed', tlLabel: 'Saida', tlIcon: 'saida', tipoApi: 'SAIDA' }
+  { label: 'Registrar\nSaída', icon: 'SAI', classe: 'saida', statusTxt: 'Expediente encerrado', dotClass: 'closed', tlLabel: 'Saída', tlIcon: 'saida', tipoApi: 'SAIDA' }
 ];
 
 const storageKey = `ponto_registros_${new Date().toISOString().slice(0, 10)}`;
@@ -327,7 +327,7 @@ function renderTimeline() {
   `).join('');
 
   const ult = registros[registros.length - 1];
-  document.getElementById('last-action').innerHTML = `Ultimo registro: <strong>${ult.label}</strong> as ${ult.hora}`;
+  document.getElementById('last-action').innerHTML = `Último registro: <strong>${ult.label}</strong> às ${ult.hora}`;
 }
 
 function registroFromResponse(ponto) {
@@ -335,7 +335,7 @@ function registroFromResponse(ponto) {
     ENTRADA: { tipo: 'entrada', label: 'Entrada', emoji: 'ENT' },
     SAIDA_ALMOCO: { tipo: 'pausa', label: 'Pausa', emoji: 'ALM' },
     VOLTA_ALMOCO: { tipo: 'retorno', label: 'Retorno', emoji: 'RET' },
-    SAIDA: { tipo: 'saida', label: 'Saida', emoji: 'SAI' }
+    SAIDA: { tipo: 'saida', label: 'Saída', emoji: 'SAI' }
   };
   const meta = tipoMap[ponto.tipo] || tipoMap.ENTRADA;
   const dataRegistro = ponto.registrado_em ? new Date(String(ponto.registrado_em).replace(' ', 'T')) : new Date();
@@ -351,7 +351,7 @@ async function baterPonto() {
   if (etapa >= SEQUENCIA.length || registrando) return;
 
   if (!navigator.onLine) {
-    toast('Sem internet. Verifique sua conexao e tente novamente.', 'error');
+    toast('Sem internet. Verifique sua conexão e tente novamente.', 'error');
     return;
   }
 
@@ -378,7 +378,7 @@ async function baterPonto() {
   } catch (error) {
     const message = error.message || 'Falha ao registrar ponto.';
     toast(message, 'error');
-    if (/sessao|token|QR Code/i.test(message)) {
+    if (/sessao|token/i.test(message)) {
       setTimeout(sair, 1600);
     }
   } finally {
@@ -405,7 +405,7 @@ overlay.addEventListener('click', () => {
 });
 
 function toast(msg, tipo='info') {
-  const icons = { success:'OK', error:'ERRO', info:'INFO', warning:'AVISO' };
+  const icons = { success:'✅', error:'❌', info:'ℹ️', warning:'⚠️' };
   const el = document.createElement('div');
   el.className = `toast toast-${tipo}`;
   el.innerHTML = `<span class="toast-icon">${icons[tipo] || icons.info}</span><span class="toast-msg">${msg}</span>`;
@@ -418,8 +418,10 @@ function sair() {
   sessionStorage.removeItem('funcionario_data');
   sessionStorage.removeItem('func_nome');
   sessionStorage.removeItem('func_cpf');
-  window.location.href = '/funcionario/login.html';
+  window.location.href = '/login';
 }
 </script>
 </body>
 </html>
+
+

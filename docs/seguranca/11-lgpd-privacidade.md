@@ -13,7 +13,7 @@
 - src/controllers/adminEmployeeController.js
 - src/utils/cpf.js
 - src/utils/logger.js
-- ponto.sql
+- database/schema/ponto.sql
 
 ## Direcao para evolucao
 

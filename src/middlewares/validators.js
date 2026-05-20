@@ -151,8 +151,7 @@ const funcionarioLoginValidator = withValidation([
     .isString()
     .withMessage('Senha deve ser texto')
     .isLength({ min: 8, max: 72 })
-    .withMessage('Senha deve ter entre 8 e 72 caracteres'),
-  qrCodeRule()
+    .withMessage('Senha deve ter entre 8 e 72 caracteres')
 ]);
 
 const baterPontoValidator = withValidation([

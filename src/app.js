@@ -6,19 +6,18 @@ const helmet = require('helmet');
 const cors = require('cors');
 const env = require('./config/env');
 const apiRoutes = require('./routes');
+const { createPagesRouter } = require('./routes/pages.routes');
 const punchRoutes = require('./routes/punchRoutes');
+const { validateQrCode } = require('./services/qrCodeService');
 const { globalLimiter } = require('./middlewares/rateLimiters');
 const { notFoundMiddleware } = require('./middlewares/notFoundMiddleware');
 const { errorMiddleware } = require('./middlewares/errorMiddleware');
 
 const app = express();
 const viewsRoot = path.resolve(__dirname, '../views');
-const frontendAssets = path.join(viewsRoot, 'assets');
-const frontendCss = path.join(frontendAssets, 'css');
-const frontendJs = path.join(frontendAssets, 'js');
-const frontendImg = path.join(frontendAssets, 'img');
-const frontendAdmin = path.join(viewsRoot, 'admin');
-const funcionarioRoot = path.join(viewsRoot, 'funcionario');
+const publicRoot = path.join(__dirname, '../public');
+const assetsRoot = path.join(publicRoot, 'assets');
+const publicImg = path.join(publicRoot, 'img');
 const staticOptions = {
   maxAge: '1h'
 };
@@ -47,30 +46,65 @@ app.use(
   })
 );
 
+function getRequestHost(req) {
+  return String(req.headers['x-forwarded-host'] || req.get('host') || '')
+    .split(',')[0]
+    .trim()
+    .toLowerCase();
+}
+
+function isSameHostOrigin(req, origin) {
+  if (!origin) {
+    return true;
+  }
+
+  try {
+    const originUrl = new URL(origin);
+    const requestHost = getRequestHost(req);
+    return requestHost.length > 0 && originUrl.host.toLowerCase() === requestHost;
+  } catch (_error) {
+    return false;
+  }
+}
+
+function isAllowedRequestOrigin(req, origin) {
+  if (!origin) {
+    return true;
+  }
+  if (isSameHostOrigin(req, origin)) {
+    return true;
+  }
+  return isAllowedOrigin(origin);
+}
+
+const corsBaseOptions = {
+  credentials: true,
+  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
 app.use(
-  cors({
-    origin(origin, callback) {
-      if (isAllowedOrigin(origin)) {
-        return callback(null, true);
-      }
-      const error = new Error('Origem nao permitida por CORS');
-      error.status = 403;
-      error.code = 'CORS_ORIGIN_BLOCKED';
-      return callback(error);
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+  cors((req, callback) => {
+    const origin = req.headers.origin;
+
+    if (isAllowedRequestOrigin(req, origin)) {
+      return callback(null, {
+        ...corsBaseOptions,
+        origin: true
+      });
+    }
+
+    const error = new Error('Origem nao permitida por CORS');
+    error.status = 403;
+    error.code = 'CORS_ORIGIN_BLOCKED';
+    return callback(error);
   })
 );
 
-app.use('/assets', express.static(frontendAssets));
-app.use('/ponto/assets', express.static(frontendAssets, staticOptions));
-app.use('/css', express.static(frontendCss, staticOptions));
-app.use('/js', express.static(frontendJs, staticOptions));
-app.use('/img', express.static(frontendImg, staticOptions));
-app.use('/admin', express.static(frontendAdmin));
-app.use('/funcionario', express.static(funcionarioRoot));
+app.use(express.static(publicRoot, staticOptions));
+
+app.use('/assets', express.static(assetsRoot, staticOptions));
+app.use('/img', express.static(publicImg, staticOptions));
 
 app.use(express.json({ limit: '100kb' }));
 app.use(express.urlencoded({ extended: false, limit: '100kb' }));
@@ -80,27 +114,19 @@ app.get('/health', (req, res) => {
   res.status(200).json({ success: true, data: { status: 'ok' } });
 });
 
-app.get('/', (req, res) => {
+function sendView(res, relativePath) {
   res.set(noCacheHtmlHeaders);
-  res.sendFile(path.join(viewsRoot, 'index.html'));
-});
-app.get('/index.html', (req, res) => {
-  res.set(noCacheHtmlHeaders);
-  res.sendFile(path.join(viewsRoot, 'index.html'));
-});
-app.get('/bater-ponto', (req, res) => {
-  res.redirect('/ponto/acessar');
-});
-app.get('/ponto', (req, res) => {
-  res.redirect('/ponto/acessar');
-});
-app.get('/ponto/acessar', (req, res) => {
-  res.set(noCacheHtmlHeaders);
-  res.sendFile(path.join(funcionarioRoot, 'login.html'));
-});
-app.get('/admin', (req, res) => {
-  res.redirect('/admin/dashboard.html');
-});
+  res.sendFile(path.join(viewsRoot, relativePath));
+}
+
+app.use(
+  createPagesRouter({
+    sendView,
+    validateQrCode,
+    schoolUnitCode: env.SCHOOL_UNIT_CODE,
+    noCacheHtmlHeaders
+  })
+);
 
 app.use('/ponto', punchRoutes);
 app.use('/api', apiRoutes);

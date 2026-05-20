@@ -101,15 +101,13 @@ async function authenticateFuncionario(req, _res, next) {
       nome: funcionario.nome,
       role: 'funcionario',
       email: funcionario.email,
-      cpf: funcionario.cpf,
-      qrCodeId: Number(payload.qrCodeId || 0),
-      qrCodeHash: String(payload.qrCodeHash || '')
+      cpf: funcionario.cpf
     };
 
     return next();
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
-      return next(new UnauthorizedError('Sessao expirada. Escaneie o QR Code novamente.'));
+      return next(new UnauthorizedError('Sessao expirada. Faca login novamente.'));
     }
 
     if (error.name === 'JsonWebTokenError' || error.name === 'NotBeforeError') {

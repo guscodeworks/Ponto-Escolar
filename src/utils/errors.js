@@ -95,6 +95,17 @@ function normalizeError(error) {
     if (error.code === 'ER_DATA_TOO_LONG' || error.code === 'ER_TRUNCATED_WRONG_VALUE') {
       return new ValidationError('Provided data is invalid or too long');
     }
+
+    const candidateStatus = Number.isInteger(error.statusCode)
+      ? error.statusCode
+      : (Number.isInteger(error.status) ? error.status : null);
+    if (candidateStatus && candidateStatus >= 400 && candidateStatus < 600) {
+      return new AppError(error.message || 'Request error', {
+        statusCode: candidateStatus,
+        code: typeof error.code === 'string' ? error.code : 'REQUEST_ERROR',
+        details: error.details || null
+      });
+    }
   }
 
   return new InternalServerError();
