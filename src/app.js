@@ -17,7 +17,9 @@ const app = express();
 const viewsRoot = path.resolve(__dirname, '../views');
 const publicRoot = path.join(__dirname, '../public');
 const assetsRoot = path.join(publicRoot, 'assets');
-const publicImg = path.join(publicRoot, 'img');
+const assetsCssRoot = path.join(assetsRoot, 'css');
+const assetsJsRoot = path.join(assetsRoot, 'js');
+const assetsImgRoot = path.join(assetsRoot, 'img');
 const staticOptions = {
   maxAge: '1h'
 };
@@ -42,7 +44,13 @@ app.set('trust proxy', 1);
 
 app.use(
   helmet({
-    crossOriginResourcePolicy: { policy: 'same-site' }
+    crossOriginResourcePolicy: { policy: 'cross-origin' }, // ← seguro para LAN/IP
+    contentSecurityPolicy: {
+      directives: {
+        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        'upgrade-insecure-requests': null, // ← remove o upgrade forçado de HTTP→HTTPS
+      }
+    }
   })
 );
 
@@ -102,9 +110,7 @@ app.use(
 );
 
 app.use(express.static(publicRoot, staticOptions));
-
 app.use('/assets', express.static(assetsRoot, staticOptions));
-app.use('/img', express.static(publicImg, staticOptions));
 
 app.use(express.json({ limit: '100kb' }));
 app.use(express.urlencoded({ extended: false, limit: '100kb' }));
