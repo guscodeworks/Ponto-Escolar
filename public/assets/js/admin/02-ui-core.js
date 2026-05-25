@@ -61,7 +61,7 @@ function iniciarSidebar() {
    ============================================================ */
 
 function iniciarTabs() {
-  const tabBtns = document.querySelectorAll('.tab-btn[data-tab]');
+  const tabBtns = document.querySelectorAll('.ui-tab[data-tab]');
   if (!tabBtns.length) return;
   tabBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -116,4 +116,5 @@ function renderizarStats() {
   set('hero-ausentes',  ausentes);
   set('hero-total',     FUNCIONARIOS.length);
 }
+
 

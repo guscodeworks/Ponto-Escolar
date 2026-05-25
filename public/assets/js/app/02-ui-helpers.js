@@ -38,7 +38,7 @@ function mapReportRowToStatus(item) {
 }
 
 function bindTabs() {
-  const tabButtons = document.querySelectorAll('.tab-btn[data-tab]');
+  const tabButtons = document.querySelectorAll('.ui-tab[data-tab]');
   tabButtons.forEach((button) => {
     button.addEventListener('click', () => {
       const targetId = button.dataset.tab;
@@ -50,4 +50,5 @@ function bindTabs() {
     });
   });
 }
+
 

@@ -50,7 +50,7 @@ function renderEmployeesTable(tableBody, employees, presentIds) {
           <td><span class="badge ${statusClass}">${statusLabel}</span></td>
           <td>
             <div style="display:flex; gap:8px;">
-              <button class="btn btn-ghost btn-sm js-toggle-status" data-id="${employee.id}" data-ativo="${employee.ativo ? '1' : '0'}">
+              <button class="ui-btn ui-btn-ghost ui-btn-sm js-toggle-status" data-id="${employee.id}" data-ativo="${employee.ativo ? '1' : '0'}">
                 ${employee.ativo ? 'Desativar' : 'Ativar'}
               </button>
             </div>
@@ -88,12 +88,12 @@ async function initEmployeesPage() {
     const filtered = !query
       ? employees
       : employees.filter((employee) => {
-          return (
-            employee.nome.toLowerCase().includes(query) ||
-            employee.email.toLowerCase().includes(query) ||
-            employee.cpf.toLowerCase().includes(query)
-          );
-        });
+        return (
+          employee.nome.toLowerCase().includes(query) ||
+          employee.email.toLowerCase().includes(query) ||
+          employee.cpf.toLowerCase().includes(query)
+        );
+      });
     renderEmployeesGrid(listContainer, filtered, presentIds);
     renderEmployeesTable(tableBody, filtered, presentIds);
     bindEmployeeStatusButtons();
@@ -196,4 +196,5 @@ async function initRegisterEmployeePage() {
     }
   });
 }
+
 

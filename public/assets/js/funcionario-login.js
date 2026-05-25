@@ -10,6 +10,20 @@
     return;
   }
 
+  function getQrCodeFromUrl() {
+    const params = new URLSearchParams(window.location.search || '');
+    return String(params.get('qr_code') || '').trim();
+  }
+
+  function getCurrentQrCode() {
+    return getQrCodeFromUrl();
+  }
+
+  const qrCodeFromUrl = getQrCodeFromUrl();
+  if (qrCodeFromUrl) {
+    sessionStorage.setItem('funcionario_qr_code', qrCodeFromUrl);
+  }
+
   function toast(msg, tipo = 'info') {
     const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
     const el = document.createElement('div');
@@ -58,6 +72,7 @@
   btnLogin.addEventListener('click', async function () {
     const cpf = cpfInput.value;
     const senha = senhaInput.value;
+    const qrCode = getCurrentQrCode();
     let ok = true;
 
     document.getElementById('cpf-error').classList.remove('visible');
@@ -82,6 +97,10 @@
     }
 
     if (!ok) return;
+    if (!qrCode) {
+      toast('Acesso indisponível. Escaneie o QR Code atualizado para entrar.', 'error');
+      return;
+    }
 
     btnLogin.classList.add('loading');
     btnLogin.disabled = true;
@@ -91,7 +110,8 @@
         method: 'POST',
         body: {
           cpf: cpf.replace(/\D/g, ''),
-          senha
+          senha,
+          qrCode
         }
       });
 
@@ -99,6 +119,7 @@
       sessionStorage.setItem('funcionario_data', JSON.stringify(data.funcionario));
       sessionStorage.setItem('func_nome', data.funcionario?.nome || '');
       sessionStorage.setItem('func_cpf', cpf);
+      sessionStorage.setItem('funcionario_qr_code', qrCode);
 
       if (remember.checked && validarCPF(cpfInput.value)) {
         localStorage.setItem('func_saved_cpf', cpfInput.value);

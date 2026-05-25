@@ -18,7 +18,7 @@
 .sidebar-brand,
 .sidebar-user,
 .topbar,
-.card,
+.ui-panel,
 .profile-hero {
   border: 1px solid rgba(255, 255, 255, 0.58);
 }
@@ -405,7 +405,7 @@
   font-size: 14px;
 }
 
-.card,
+.ui-panel,
 .profile-hero {
   background: var(--surface);
   border-color: rgba(255, 255, 255, 0.76);
@@ -413,14 +413,14 @@
   box-shadow: var(--shadow-card);
 }
 
-.card-header {
+.ui-panel-header {
   display: flex;
   justify-content: space-between;
   gap: 16px;
   padding: 22px 24px;
 }
 
-.card-title,
+.ui-panel-title,
 .profile-section-title {
   font-weight: 900;
   color: var(--text-900);
@@ -516,29 +516,29 @@
   color: var(--text-500);
 }
 
-.btn-primary {
+.ui-btn-primary {
   color: #fff;
   background: linear-gradient(135deg, var(--blue-700), var(--green-600));
 }
 
-.btn-secondary {
+.ui-btn-secondary {
   color: var(--blue-700);
   background: #edf4ff;
 }
 
-.btn-ghost {
+.ui-btn-ghost {
   color: var(--text-700);
   border: 1px solid var(--border-light);
   background: rgba(255, 255, 255, 0.56);
 }
 
-.btn-sm {
+.ui-btn-sm {
   min-height: 38px;
   padding: 0 14px;
   border-radius: 12px;
 }
 
-.btn-block {
+.ui-btn-block {
   width: 100%;
 }
 
@@ -729,7 +729,7 @@
   margin-top: 12px;
 }
 
-.card-padded {
+.ui-panel-padded {
   padding: 22px;
 }
 
@@ -783,4 +783,3 @@
 .toast-warning {
   border-color: rgba(217, 138, 0, 0.28);
 }
-

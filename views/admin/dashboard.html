@@ -198,13 +198,13 @@
       <div style="display:grid;grid-template-columns:1fr 340px;gap:20px;margin-bottom:20px;" class="dash-grid">
 
         <!-- Últimos registros -->
-        <div class="card fade-in">
-          <div class="card-header">
+        <div class="ui-panel fade-in">
+          <div class="ui-panel-header">
             <div>
-              <div class="card-title">Últimos Registros de Ponto</div>
-              <div class="card-subtitle">Atualizados em tempo real</div>
+              <div class="ui-panel-title">Últimos Registros de Ponto</div>
+              <div class="ui-panel-subtitle">Atualizados em tempo real</div>
             </div>
-            <a href="/admin/pontos-do-dia" class="btn btn-ghost btn-sm">Ver todos →</a>
+            <a href="/admin/pontos-do-dia" class="ui-btn ui-btn-ghost ui-btn-sm">Ver todos →</a>
           </div>
           <div class="table-wrap table-desktop">
             <table class="data-table">
@@ -227,9 +227,9 @@
         <div style="display:flex;flex-direction:column;gap:20px;">
 
           <!-- Gráfico de presença semanal -->
-          <div class="card fade-in">
-            <div class="card-header">
-              <div class="card-title">Presença Semanal</div>
+          <div class="ui-panel fade-in">
+            <div class="ui-panel-header">
+              <div class="ui-panel-title">Presença Semanal</div>
             </div>
             <div style="padding:16px 20px;">
               <div class="presence-chart-wrap" id="grafico-presenca"></div>
@@ -237,12 +237,12 @@
           </div>
 
           <!-- Alertas -->
-          <div class="card fade-in">
-            <div class="card-header">
-              <div class="card-title">Alertas</div>
+          <div class="ui-panel fade-in">
+            <div class="ui-panel-header">
+              <div class="ui-panel-title">Alertas</div>
             </div>
             <div style="padding:14px 16px;">
-              <div class="alert-list" id="lista-alertas"></div>
+              <div class="notice-list" id="lista-alertas"></div>
             </div>
           </div>
 
@@ -263,7 +263,7 @@
   <script src="/assets/js/admin/06-reports.js"></script>
   <script src="/assets/js/admin/07-register.js"></script>
   <script src="/assets/js/admin/08-settings-login.js"></script>
-  <script src="/assets/js/admin/09-bootstrap.js"></script>
+  <script src="/assets/js/admin/09-init.js"></script>
 <script>
   // Responsividade tabela→cards
   function checkMobile() {
@@ -304,6 +304,8 @@
 </script>
 </body>
 </html>
+
+
 
 
 

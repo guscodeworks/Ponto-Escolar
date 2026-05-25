@@ -42,16 +42,15 @@ function isAllowedOrigin(origin) {
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
 
-app.use(
-  helmet({
-    crossOriginResourcePolicy: { policy: 'cross-origin' }, // ← seguro para LAN/IP
-    contentSecurityPolicy: {
-      directives: {
-        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-        'upgrade-insecure-requests': null, // ← remove o upgrade forçado de HTTP→HTTPS
-      }
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' }, // ← seguro para LAN/IP
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      'upgrade-insecure-requests': null, // ← remove o upgrade forçado de HTTP→HTTPS
     }
-  })
+  }
+})
 );
 
 function getRequestHost(req) {

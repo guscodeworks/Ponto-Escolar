@@ -11,7 +11,9 @@
   backdrop-filter: blur(2px);
 }
 
-.sidebar-overlay.active { display: block; }
+.sidebar-overlay.active {
+  display: block;
+}
 
 /* ============================================================
    PÁGINA DE LOGIN
@@ -40,7 +42,7 @@
   content: '';
   position: fixed;
   inset: 0;
-  background-image: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 32px 32px;
 }
 
@@ -96,7 +98,11 @@
   margin-bottom: 32px;
 }
 
-.login-form { display: flex; flex-direction: column; gap: 16px; }
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
 
 /* ============================================================
    PAGINA PUBLICA DE BATIDA

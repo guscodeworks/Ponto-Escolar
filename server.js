@@ -1,14 +1,14 @@
-'use strict';
+﻿'use strict';
 
 const app = require('./src/app');
 const env = require('./src/config/env');
 const { checkConnection } = require('./src/config/database');
 
-async function bootstrap() {
+async function startServer() {
   try {
     await checkConnection();
     app.listen(env.PORT, () => {
-      console.log(`Servidor seguro de ponto iniciado na porta ${env.PORT}.`);
+      console.log(`Servidor iniciado na porta ${env.PORT}.`);
     });
   } catch (error) {
     console.error('Falha ao inicializar servidor:', error.message);
@@ -16,4 +16,4 @@ async function bootstrap() {
   }
 }
 
-bootstrap();
+startServer();

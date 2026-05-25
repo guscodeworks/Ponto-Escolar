@@ -81,7 +81,7 @@
           <h1 class="page-title">Funcionários</h1>
           <p class="page-subtitle"><span id="total-func">—</span> funcionários no sistema</p>
         </div>
-        <a href="/admin/funcionarios/novo" class="btn btn-primary">
+        <a href="/admin/funcionarios/novo" class="ui-btn ui-btn-primary">
           ➕ Registrar Funcionário
         </a>
       </div>
@@ -110,12 +110,12 @@
           </select>
         </div>
         <div class="action-bar-right">
-          <button class="btn btn-secondary btn-sm" onclick="toast('Exportação iniciada.', 'info')">⬇ Exportar</button>
+          <button class="ui-btn ui-btn-secondary ui-btn-sm" onclick="toast('Exportação iniciada.', 'info')">⬇ Exportar</button>
         </div>
       </div>
 
       <!-- Tabela desktop -->
-      <div class="card fade-in table-desktop">
+      <div class="ui-panel fade-in table-desktop">
         <div class="table-wrap">
           <table class="data-table">
             <thead>
@@ -142,13 +142,13 @@
 </div>
 
 <!-- MODAL EDITAR -->
-<div class="modal-overlay" id="modal-editar">
-  <div class="modal-box">
-    <div class="modal-header">
-      <div class="modal-title">✏️ Editar Funcionário</div>
-      <button class="modal-close" onclick="fecharModal('modal-editar')">✕</button>
+<div class="ui-dialog-overlay" id="modal-editar">
+  <div class="ui-dialog-box">
+    <div class="ui-dialog-header">
+      <div class="ui-dialog-title">✏️ Editar Funcionário</div>
+      <button class="ui-dialog-close" onclick="fecharModal('modal-editar')">✕</button>
     </div>
-    <div class="modal-body">
+    <div class="ui-dialog-body">
       <input type="hidden" id="edit-id"/>
       <div class="form-grid-2">
         <div class="form-field full">
@@ -204,9 +204,9 @@
         </div>
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="fecharModal('modal-editar')">Cancelar</button>
-      <button class="btn btn-primary" onclick="salvarEdicao()">💾 Salvar alterações</button>
+    <div class="ui-dialog-footer">
+      <button class="ui-btn ui-btn-ghost" onclick="fecharModal('modal-editar')">Cancelar</button>
+      <button class="ui-btn ui-btn-primary" onclick="salvarEdicao()">💾 Salvar alterações</button>
     </div>
   </div>
 </div>
@@ -221,7 +221,7 @@
   <script src="/assets/js/admin/06-reports.js"></script>
   <script src="/assets/js/admin/07-register.js"></script>
   <script src="/assets/js/admin/08-settings-login.js"></script>
-  <script src="/assets/js/admin/09-bootstrap.js"></script>
+  <script src="/assets/js/admin/09-init.js"></script>
 <script>
   function checkMobile() {
     const isMobile = window.innerWidth <= 768;
@@ -233,6 +233,8 @@
 </script>
 </body>
 </html>
+
+
 
 
 

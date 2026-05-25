@@ -179,7 +179,7 @@
 /* ============================================================
    BOTÕES
    ============================================================ */
-.btn {
+.ui-btn {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 9px 18px;
   border-radius: var(--r-md);
@@ -188,26 +188,26 @@
   transition: all var(--ease-fast);
   letter-spacing: 0.01em; white-space: nowrap;
 }
-.btn:active { transform: scale(0.97); }
+.ui-btn:active { transform: scale(0.97); }
 
-.btn-primary  { background: var(--blue-700); color: white; }
-.btn-primary:hover { background: var(--blue-800); box-shadow: var(--shadow-blue); }
+.ui-btn-primary  { background: var(--blue-700); color: white; }
+.ui-btn-primary:hover { background: var(--blue-800); box-shadow: var(--shadow-blue); }
 
-.btn-secondary { background: var(--bg-surface); color: var(--text-700); border: 1.5px solid var(--border-medium); }
-.btn-secondary:hover { background: var(--bg-base); border-color: var(--border-strong); }
+.ui-btn-secondary { background: var(--bg-surface); color: var(--text-700); border: 1.5px solid var(--border-medium); }
+.ui-btn-secondary:hover { background: var(--bg-base); border-color: var(--border-strong); }
 
-.btn-ghost { background: transparent; color: var(--text-500); border: 1.5px solid var(--border-light); }
-.btn-ghost:hover { background: var(--bg-base); color: var(--text-900); }
+.ui-btn-ghost { background: transparent; color: var(--text-500); border: 1.5px solid var(--border-light); }
+.ui-btn-ghost:hover { background: var(--bg-base); color: var(--text-900); }
 
-.btn-danger { background: var(--red-50); color: var(--red-600); border: 1.5px solid rgba(239,68,68,0.25); }
-.btn-danger:hover { background: var(--red-100); border-color: var(--red-500); }
+.ui-btn-danger { background: var(--red-50); color: var(--red-600); border: 1.5px solid rgba(239,68,68,0.25); }
+.ui-btn-danger:hover { background: var(--red-100); border-color: var(--red-500); }
 
-.btn-success { background: var(--green-50); color: var(--green-600); border: 1.5px solid rgba(18,160,102,0.25); }
-.btn-success:hover { background: var(--green-100); }
+.ui-btn-success { background: var(--green-50); color: var(--green-600); border: 1.5px solid rgba(18,160,102,0.25); }
+.ui-btn-success:hover { background: var(--green-100); }
 
-.btn-sm  { padding: 6px 12px; font-size: 12px; border-radius: var(--r-sm); }
-.btn-lg  { padding: 12px 24px; font-size: 15px; }
-.btn-block { width: 100%; justify-content: center; }
+.ui-btn-sm  { padding: 6px 12px; font-size: 12px; border-radius: var(--r-sm); }
+.ui-btn-lg  { padding: 12px 24px; font-size: 15px; }
+.ui-btn-block { width: 100%; justify-content: center; }
 
 /* ============================================================
    ACTION BAR / FILTROS
@@ -264,7 +264,7 @@
   margin-bottom: 20px;
 }
 
-.tab-btn {
+.ui-tab {
   padding: 7px 16px;
   border-radius: 8px;
   font-size: 13px; font-weight: 600;
@@ -273,9 +273,10 @@
   transition: all var(--ease-fast);
   font-family: var(--font);
 }
-.tab-btn.active { background: var(--bg-surface); color: var(--blue-700); box-shadow: var(--shadow-sm); }
-.tab-btn:hover:not(.active) { color: var(--text-700); }
+.ui-tab.active { background: var(--bg-surface); color: var(--blue-700); box-shadow: var(--shadow-sm); }
+.ui-tab:hover:not(.active) { color: var(--text-700); }
 
 .tab-panel { display: none; }
 .tab-panel.active { display: block; }
+
 

@@ -28,7 +28,7 @@ function renderizarUltimosRegistros() {
         <td class="td-mono">${p.saida ?? '<span style="color:var(--text-300)">—</span>'}</td>
         <td><span class="badge ${p.status==='completo'?'badge-ok':'badge-info'}">${p.status==='completo'?'Completo':'Em andamento'}</span></td>
         <td>
-          <button class="btn btn-ghost btn-sm" onclick="toast('Ajuste registrado com sucesso.','success')">✏️ Ajustar</button>
+          <button class="ui-btn ui-btn-ghost ui-btn-sm" onclick="toast('Ajuste registrado com sucesso.','success')">✏️ Ajustar</button>
         </td>
       </tr>
     `;
@@ -73,13 +73,14 @@ function renderizarAlertas() {
   ].filter(Boolean);
 
   container.innerHTML = alertas.map(a => `
-    <div class="alert-item ${a.tipo}">
-      <div class="alert-icon">${a.icon}</div>
-      <div class="alert-content">
-        <div class="alert-title">${a.titulo}</div>
-        <div class="alert-desc">${a.desc}</div>
+    <div class="notice-item ${a.tipo}">
+      <div class="notice-icon">${a.icon}</div>
+      <div class="notice-content">
+        <div class="notice-title">${a.titulo}</div>
+        <div class="notice-desc">${a.desc}</div>
       </div>
     </div>
   `).join('');
 }
+
 
