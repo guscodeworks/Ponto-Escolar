@@ -11,7 +11,7 @@
     '/assets/js/app/03-dashboard.js',
     '/assets/js/app/04-employees.js',
     '/assets/js/app/05-points-reports.js',
-    '/assets/js/app/06-bootstrap.js'
+    '/assets/js/app/06-init.js'
   ];
 
   if (document.readyState === 'loading') {
@@ -31,3 +31,4 @@
     });
   }, Promise.resolve());
 })();
+

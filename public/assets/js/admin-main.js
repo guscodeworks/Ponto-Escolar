@@ -14,7 +14,7 @@
     '/assets/js/admin/06-reports.js',
     '/assets/js/admin/07-register.js',
     '/assets/js/admin/08-settings-login.js',
-    '/assets/js/admin/09-bootstrap.js'
+    '/assets/js/admin/09-init.js'
   ];
 
   if (document.readyState === 'loading') {
@@ -34,3 +34,4 @@
     });
   }, Promise.resolve());
 })();
+

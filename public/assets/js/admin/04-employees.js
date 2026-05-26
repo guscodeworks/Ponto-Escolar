@@ -43,8 +43,8 @@ function renderizarFuncionarios(filtro = '') {
           <td><span class="badge ${funcionarioBateuPonto(f.id)?'badge-ok':'badge-absent'}">${funcionarioBateuPonto(f.id)?'Presente':'Ausente'}</span></td>
           <td>
             <div style="display:flex;gap:6px;">
-              <button class="btn btn-ghost btn-sm" onclick="abrirEdicao(${f.id})">✏️ Editar</button>
-              <button class="btn btn-danger btn-sm" onclick="confirmarExclusao(${f.id},'${f.nome}')">🗑️</button>
+              <button class="ui-btn ui-btn-ghost ui-btn-sm" onclick="abrirEdicao(${f.id})">✏️ Editar</button>
+              <button class="ui-btn ui-btn-danger ui-btn-sm" onclick="confirmarExclusao(${f.id},'${f.nome}')">🗑️</button>
             </div>
           </td>
         </tr>
@@ -64,8 +64,8 @@ function renderizarFuncionarios(filtro = '') {
             <div class="func-card-cargo">${f.cargo} · <span class="${funcionarioBateuPonto(f.id)?'':''}" style="color:${funcionarioBateuPonto(f.id)?'var(--green-600)':'var(--red-600)'}">${funcionarioBateuPonto(f.id)?'Presente':'Ausente'}</span></div>
           </div>
           <div class="func-card-actions">
-            <button class="btn btn-ghost btn-sm" onclick="abrirEdicao(${f.id})">✏️</button>
-            <button class="btn btn-danger btn-sm" onclick="confirmarExclusao(${f.id},'${f.nome}')">🗑️</button>
+            <button class="ui-btn ui-btn-ghost ui-btn-sm" onclick="abrirEdicao(${f.id})">✏️</button>
+            <button class="ui-btn ui-btn-danger ui-btn-sm" onclick="confirmarExclusao(${f.id},'${f.nome}')">🗑️</button>
           </div>
         </div>
       `).join('');
@@ -118,4 +118,5 @@ function fecharModal(id) {
   const m = document.getElementById(id);
   if (m) m.classList.remove('show');
 }
+
 

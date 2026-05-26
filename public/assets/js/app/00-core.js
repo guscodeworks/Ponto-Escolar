@@ -186,7 +186,7 @@ function bindLogoutButtons() {
 
 function setLoadingButton(button, loadingText) {
   if (!button) {
-    return () => {};
+    return () => { };
   }
   const originalText = button.textContent;
   button.disabled = true;

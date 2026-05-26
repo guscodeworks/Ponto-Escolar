@@ -107,9 +107,9 @@
 
           <!-- Perfil do admin -->
           <div class="settings-panel" id="panel-perfil">
-            <div class="card">
-              <div class="card-header">
-                <div class="card-title">👤 Dados do Administrador</div>
+            <div class="ui-panel">
+              <div class="ui-panel-header">
+                <div class="ui-panel-title">👤 Dados do Administrador</div>
               </div>
               <div style="padding:24px;">
 
@@ -158,7 +158,7 @@
                 </div>
 
                 <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border-light);">
-                  <button class="btn btn-primary" onclick="toast('Perfil salvo com sucesso!','success')">💾 Salvar alterações</button>
+                  <button class="ui-btn ui-btn-primary" onclick="toast('Perfil salvo com sucesso!','success')">💾 Salvar alterações</button>
                 </div>
               </div>
             </div>
@@ -166,9 +166,9 @@
 
           <!-- Senha -->
           <div class="settings-panel" id="panel-senha" style="display:none;">
-            <div class="card">
-              <div class="card-header">
-                <div class="card-title">🔒 Alterar Senha</div>
+            <div class="ui-panel">
+              <div class="ui-panel-header">
+                <div class="ui-panel-title">🔒 Alterar Senha</div>
               </div>
               <div style="padding:24px;max-width:440px;">
                 <div style="display:flex;flex-direction:column;gap:16px;">
@@ -193,7 +193,7 @@
                       <input type="password" id="pw-confirm" class="field-input" placeholder="Repita a nova senha"/>
                     </div>
                   </div>
-                  <button class="btn btn-primary" onclick="salvarSenha()">🔒 Atualizar senha</button>
+                  <button class="ui-btn ui-btn-primary" onclick="salvarSenha()">🔒 Atualizar senha</button>
                 </div>
               </div>
             </div>
@@ -201,9 +201,9 @@
 
           <!-- Horários -->
           <div class="settings-panel" id="panel-horarios" style="display:none;">
-            <div class="card">
-              <div class="card-header">
-                <div class="card-title">🕐 Horários Padrão do Sistema</div>
+            <div class="ui-panel">
+              <div class="ui-panel-header">
+                <div class="ui-panel-title">🕐 Horários Padrão do Sistema</div>
               </div>
               <div style="padding:24px;">
                 <div class="form-grid-2">
@@ -251,7 +251,7 @@
                   </div>
                 </div>
                 <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border-light);">
-                  <button class="btn btn-primary" onclick="toast('Horários salvos!','success')">💾 Salvar horários</button>
+                  <button class="ui-btn ui-btn-primary" onclick="toast('Horários salvos!','success')">💾 Salvar horários</button>
                 </div>
               </div>
             </div>
@@ -259,9 +259,9 @@
 
           <!-- Sistema -->
           <div class="settings-panel" id="panel-sistema" style="display:none;">
-            <div class="card">
-              <div class="card-header">
-                <div class="card-title">⚙️ Configurações do Sistema</div>
+            <div class="ui-panel">
+              <div class="ui-panel-header">
+                <div class="ui-panel-title">⚙️ Configurações do Sistema</div>
               </div>
               <div style="padding:24px;display:flex;flex-direction:column;gap:18px;">
 
@@ -315,16 +315,16 @@
 
           <!-- Permissões -->
           <div class="settings-panel" id="panel-permissoes" style="display:none;">
-            <div class="card">
-              <div class="card-header">
-                <div class="card-title">🛡️ Permissões e Acesso</div>
+            <div class="ui-panel">
+              <div class="ui-panel-header">
+                <div class="ui-panel-title">🛡️ Permissões e Acesso</div>
               </div>
               <div style="padding:24px;">
-                <div class="alert-item blue" style="margin-bottom:20px;">
-                  <div class="alert-icon">ℹ️</div>
-                  <div class="alert-content">
-                    <div class="alert-title">Gerenciamento de permissões</div>
-                    <div class="alert-desc">Defina o que cada nível de acesso pode visualizar e modificar no sistema.</div>
+                <div class="notice-item blue" style="margin-bottom:20px;">
+                  <div class="notice-icon">ℹ️</div>
+                  <div class="notice-content">
+                    <div class="notice-title">Gerenciamento de permissões</div>
+                    <div class="notice-desc">Defina o que cada nível de acesso pode visualizar e modificar no sistema.</div>
                   </div>
                 </div>
 
@@ -371,7 +371,7 @@
   <script src="/assets/js/admin/06-reports.js"></script>
   <script src="/assets/js/admin/07-register.js"></script>
   <script src="/assets/js/admin/08-settings-login.js"></script>
-  <script src="/assets/js/admin/09-bootstrap.js"></script>
+  <script src="/assets/js/admin/09-init.js"></script>
 <script>
   function salvarSenha() {
     const atual = document.getElementById('pw-atual').value;
@@ -386,6 +386,8 @@
 </script>
 </body>
 </html>
+
+
 
 
 

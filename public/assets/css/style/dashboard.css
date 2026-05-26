@@ -2,7 +2,7 @@
    CARDS
    ============================================================ */
 
-.card {
+.ui-panel {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
@@ -10,19 +10,19 @@
   transition: all var(--transition-default);
 }
 
-.card:hover {
+.ui-panel:hover {
   border-color: var(--border-default);
   box-shadow: var(--shadow-card);
 }
 
-.card-header {
+.ui-panel-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
 }
 
-.card-title {
+.ui-panel-title {
   font-family: var(--font-display);
   font-size: 15px;
   font-weight: 600;
@@ -276,10 +276,25 @@
   opacity: 0.4;
 }
 
-.stat-card.cyan .stat-card-glow { background: var(--accent-cyan); filter: blur(30px); }
-.stat-card.green .stat-card-glow { background: var(--accent-green); filter: blur(30px); }
-.stat-card.red .stat-card-glow { background: var(--accent-red); filter: blur(30px); }
-.stat-card.amber .stat-card-glow { background: var(--accent-amber); filter: blur(30px); }
+.stat-card.cyan .stat-card-glow {
+  background: var(--accent-cyan);
+  filter: blur(30px);
+}
+
+.stat-card.green .stat-card-glow {
+  background: var(--accent-green);
+  filter: blur(30px);
+}
+
+.stat-card.red .stat-card-glow {
+  background: var(--accent-red);
+  filter: blur(30px);
+}
+
+.stat-card.amber .stat-card-glow {
+  background: var(--accent-amber);
+  filter: blur(30px);
+}
 
 .stat-label {
   font-size: 11px;
@@ -300,13 +315,23 @@
   margin-bottom: 4px;
 }
 
-.stat-card.cyan .stat-value { color: var(--accent-cyan); }
-.stat-card.green .stat-value { color: var(--accent-green); }
-.stat-card.red .stat-value { color: var(--accent-red); }
-.stat-card.amber .stat-value { color: var(--accent-amber); }
+.stat-card.cyan .stat-value {
+  color: var(--accent-cyan);
+}
+
+.stat-card.green .stat-value {
+  color: var(--accent-green);
+}
+
+.stat-card.red .stat-value {
+  color: var(--accent-red);
+}
+
+.stat-card.amber .stat-value {
+  color: var(--accent-amber);
+}
 
 .stat-meta {
   font-size: 12px;
   color: var(--text-muted);
 }
-

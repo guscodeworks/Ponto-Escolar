@@ -1,7 +1,7 @@
 ﻿/* ============================================================
    CARDS
    ============================================================ */
-.card {
+.ui-panel {
   background: var(--bg-surface);
   border: 1px solid var(--border-light);
   border-radius: var(--r-lg);
@@ -9,16 +9,16 @@
   overflow: hidden;
 }
 
-.card-padded { padding: 24px; }
+.ui-panel-padded { padding: 24px; }
 
-.card-header {
+.ui-panel-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 16px 24px;
   border-bottom: 1px solid var(--border-light);
 }
 
-.card-title { font-size: 15px; font-weight: 700; color: var(--text-900); }
-.card-subtitle { font-size: 12px; color: var(--text-300); margin-top: 2px; }
+.ui-panel-title { font-size: 15px; font-weight: 700; color: var(--text-900); }
+.ui-panel-subtitle { font-size: 12px; color: var(--text-300); margin-top: 2px; }
 
 /* Hero banner (dashboard) */
 .dashboard-hero {
@@ -184,4 +184,5 @@
 .quick-card-desc  { font-size: 12px; color: var(--text-300); margin-top: 2px; }
 .quick-card-arrow { margin-left: auto; color: var(--text-300); font-size: 16px; transition: transform var(--ease-fast); flex-shrink: 0; }
 .quick-card:hover .quick-card-arrow { transform: translate(2px,-2px); color: var(--blue-600); }
+
 

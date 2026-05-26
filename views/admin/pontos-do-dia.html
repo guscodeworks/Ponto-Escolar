@@ -81,7 +81,7 @@
           <h1 class="page-title">Pontos do Dia</h1>
           <p class="page-subtitle">Registros de frequência de hoje em tempo real</p>
         </div>
-        <a href="/admin/relatorios" class="btn btn-secondary">📊 Ver relatório completo</a>
+        <a href="/admin/relatorios" class="ui-btn ui-btn-secondary">📊 Ver relatório completo</a>
       </div>
 
       <!-- Stats -->
@@ -102,15 +102,15 @@
 
       <!-- Tabs -->
       <div class="tab-bar fade-in">
-        <button class="tab-btn active" data-tab="tab-presentes">✅ Presentes</button>
-        <button class="tab-btn" data-tab="tab-ausentes">❌ Ausentes</button>
+        <button class="ui-tab active" data-tab="tab-presentes">✅ Presentes</button>
+        <button class="ui-tab" data-tab="tab-ausentes">❌ Ausentes</button>
       </div>
 
       <!-- Tab: Presentes -->
       <div class="tab-panel active" id="tab-presentes">
-        <div class="card fade-in">
-          <div class="card-header">
-            <div class="card-title">Funcionários com ponto registrado</div>
+        <div class="ui-panel fade-in">
+          <div class="ui-panel-header">
+            <div class="ui-panel-title">Funcionários com ponto registrado</div>
             <span style="font-size:12px;color:var(--text-300);">Atualizado em tempo real</span>
           </div>
           <!-- Tabela desktop -->
@@ -138,9 +138,9 @@
 
       <!-- Tab: Ausentes -->
       <div class="tab-panel" id="tab-ausentes">
-        <div class="card fade-in">
-          <div class="card-header">
-            <div class="card-title">Funcionários sem registro hoje</div>
+        <div class="ui-panel fade-in">
+          <div class="ui-panel-header">
+            <div class="ui-panel-title">Funcionários sem registro hoje</div>
             <span style="font-size:12px;color:var(--text-300);">Atualizado em tempo real</span>
           </div>
           <!-- Tabela desktop -->
@@ -162,11 +162,11 @@
           <div id="cards-ausentes" class="cards-mobile" style="display:none;padding:14px;flex-direction:column;gap:10px;"></div>
         </div>
 
-        <div class="alert-item amber fade-in" style="margin-top:14px;">
-          <div class="alert-icon">⚠️</div>
-          <div class="alert-content">
-            <div class="alert-title">Notificações automáticas</div>
-            <div class="alert-desc">Após integração com back-end, funcionários ausentes podem ser notificados automaticamente.</div>
+        <div class="notice-item amber fade-in" style="margin-top:14px;">
+          <div class="notice-icon">⚠️</div>
+          <div class="notice-content">
+            <div class="notice-title">Notificações automáticas</div>
+            <div class="notice-desc">Após integração com back-end, funcionários ausentes podem ser notificados automaticamente.</div>
           </div>
         </div>
       </div>
@@ -185,7 +185,7 @@
   <script src="/assets/js/admin/06-reports.js"></script>
   <script src="/assets/js/admin/07-register.js"></script>
   <script src="/assets/js/admin/08-settings-login.js"></script>
-  <script src="/assets/js/admin/09-bootstrap.js"></script>
+  <script src="/assets/js/admin/09-init.js"></script>
 <script>
   function checkMobile() {
     const isMobile = window.innerWidth <= 768;
@@ -201,6 +201,8 @@
 </script>
 </body>
 </html>
+
+
 
 
 

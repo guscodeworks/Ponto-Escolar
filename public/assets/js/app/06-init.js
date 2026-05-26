@@ -1,4 +1,4 @@
-﻿async function bootstrapApp() {
+﻿async function initializeApp() {
   initClock();
   initSidebar();
   bindLogoutButtons();
@@ -46,7 +46,8 @@
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  bootstrapApp().catch((error) => {
+  initializeApp().catch((error) => {
     mostrarToast(sanitizeMessage(error.message, 'Erro ao inicializar a página.'), 'error');
   });
 });
+

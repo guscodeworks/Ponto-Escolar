@@ -141,6 +141,7 @@ const validateQrTokenValidator = withValidation([
 ]);
 
 const funcionarioLoginValidator = withValidation([
+  qrCodeRule(),
   body('login')
     .optional()
     .trim()
@@ -155,6 +156,7 @@ const funcionarioLoginValidator = withValidation([
 ]);
 
 const baterPontoValidator = withValidation([
+  qrCodeRule(),
   body('latitude')
     .notEmpty()
     .withMessage('Localizacao obrigatoria para bater ponto')

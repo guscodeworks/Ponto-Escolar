@@ -29,19 +29,19 @@
 /* ============================================================
    MODAL
    ============================================================ */
-.modal-overlay {
+.ui-dialog-overlay {
   position: fixed; inset: 0;
   background: rgba(0,0,0,0.45);
   z-index: 400;
   display: none; align-items: center; justify-content: center;
   backdrop-filter: blur(4px);
 }
-.modal-overlay.show {
+.ui-dialog-overlay.show {
   display: flex;
   animation: fadeIn 0.2s ease;
 }
 
-.modal-box {
+.ui-dialog-box {
   background: var(--bg-surface);
   border-radius: var(--r-xl);
   width: 90%; max-width: 520px;
@@ -50,25 +50,25 @@
   animation: zoomIn 0.25s var(--ease-spring);
 }
 
-.modal-header {
+.ui-dialog-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 20px 24px;
   border-bottom: 1px solid var(--border-light);
 }
 
-.modal-title { font-size: 17px; font-weight: 700; color: var(--text-900); }
+.ui-dialog-title { font-size: 17px; font-weight: 700; color: var(--text-900); }
 
-.modal-close {
+.ui-dialog-close {
   background: none; border: none;
   color: var(--text-300); font-size: 20px;
   cursor: pointer; padding: 4px; line-height: 1;
   border-radius: var(--r-sm);
   transition: all var(--ease-fast);
 }
-.modal-close:hover { background: var(--bg-base); color: var(--text-700); }
+.ui-dialog-close:hover { background: var(--bg-base); color: var(--text-700); }
 
-.modal-body { padding: 24px; }
-.modal-footer {
+.ui-dialog-body { padding: 24px; }
+.ui-dialog-footer {
   display: flex; gap: 10px; justify-content: flex-end;
   padding: 16px 24px;
   border-top: 1px solid var(--border-light);
@@ -113,23 +113,23 @@
 .presence-bar:hover { opacity: 0.8; }
 
 /* Alertas */
-.alert-list { display: flex; flex-direction: column; gap: 10px; }
+.notice-list { display: flex; flex-direction: column; gap: 10px; }
 
-.alert-item {
+.notice-item {
   display: flex; align-items: flex-start; gap: 12px;
   padding: 12px 16px;
   border-radius: var(--r-md);
   border: 1px solid;
 }
 
-.alert-item.amber { background: var(--amber-50); border-color: rgba(217,119,6,0.2); }
-.alert-item.red   { background: var(--red-50);   border-color: rgba(239,68,68,0.2); }
-.alert-item.blue  { background: var(--blue-50);  border-color: rgba(26,101,200,0.2); }
+.notice-item.amber { background: var(--amber-50); border-color: rgba(217,119,6,0.2); }
+.notice-item.red   { background: var(--red-50);   border-color: rgba(239,68,68,0.2); }
+.notice-item.blue  { background: var(--blue-50);  border-color: rgba(26,101,200,0.2); }
 
-.alert-icon { font-size: 17px; flex-shrink: 0; margin-top: 1px; }
-.alert-content { flex: 1; }
-.alert-title { font-size: 13px; font-weight: 700; color: var(--text-900); }
-.alert-desc  { font-size: 12px; color: var(--text-500); margin-top: 2px; }
+.notice-icon { font-size: 17px; flex-shrink: 0; margin-top: 1px; }
+.notice-content { flex: 1; }
+.notice-title { font-size: 13px; font-weight: 700; color: var(--text-900); }
+.notice-desc  { font-size: 12px; color: var(--text-500); margin-top: 2px; }
 
 /* Preview card (registrar funcionário) */
 .preview-card {
@@ -244,6 +244,7 @@
   animation: spin 0.7s linear infinite;
   display: none;
 }
-.btn.loading .btn-label { display: none; }
-.btn.loading .spinner   { display: block; }
+.ui-btn.loading .btn-label { display: none; }
+.ui-btn.loading .spinner   { display: block; }
+
 

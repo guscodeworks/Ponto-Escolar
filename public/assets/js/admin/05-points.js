@@ -30,7 +30,7 @@ function renderizarPontosHoje() {
         <td class="td-mono">${p.saida ?? '<span style="color:var(--text-300)">—</span>'}</td>
         <td><span class="badge ${p.status==='completo'?'badge-ok':'badge-info'}">${p.status==='completo'?'Completo':'Em andamento'}</span></td>
         <td>
-          <button class="btn btn-ghost btn-sm" onclick="toast('Ajuste salvo','success')">✏️ Ajustar</button>
+          <button class="ui-btn ui-btn-ghost ui-btn-sm" onclick="toast('Ajuste salvo','success')">✏️ Ajustar</button>
         </td>
       </tr>
     `).join('') : `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Nenhum registro hoje</div></div></td></tr>`;
@@ -72,7 +72,7 @@ function renderizarPontosHoje() {
         <td class="td-mono">${func.tel}</td>
         <td><span class="badge badge-absent">Não bateu ponto</span></td>
         <td>
-          <button class="btn btn-ghost btn-sm" onclick="toast('Notificação enviada.','info')">📨 Notificar</button>
+          <button class="ui-btn ui-btn-ghost ui-btn-sm" onclick="toast('Notificação enviada.','info')">📨 Notificar</button>
         </td>
       </tr>
     `).join('') : `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">🎉</div><div class="empty-title">Todos bateram ponto hoje!</div></div></td></tr>`;
@@ -86,7 +86,7 @@ function renderizarPontosHoje() {
           <div class="func-card-name">${func.nome}</div>
           <div class="func-card-cargo">${func.cargo}</div>
         </div>
-        <button class="btn btn-ghost btn-sm" onclick="toast('Notificação enviada','info')">📨</button>
+        <button class="ui-btn ui-btn-ghost ui-btn-sm" onclick="toast('Notificação enviada','info')">📨</button>
       </div>
     `).join('') : `<div class="empty-state"><div class="empty-icon">🎉</div><div class="empty-title">Todos presentes!</div></div>`;
   }
@@ -96,4 +96,5 @@ function renderizarPontosHoje() {
   set('count-presentes', lista.length);
   set('count-ausentes',  ausentes.length);
 }
+
 

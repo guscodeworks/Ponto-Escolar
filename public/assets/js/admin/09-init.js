@@ -22,7 +22,8 @@
   if (btnImprimir) btnImprimir.addEventListener('click', imprimirRelatorio);
 
   // Modal fechar ao clicar fora
-  document.querySelectorAll('.modal-overlay').forEach(m => {
+  document.querySelectorAll('.ui-dialog-overlay').forEach(m => {
     m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); });
   });
 });
+

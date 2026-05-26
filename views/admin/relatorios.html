@@ -92,17 +92,17 @@
         </div>
         <div class="action-bar no-print" style="margin-bottom:0;">
           <div class="action-bar-right">
-            <button id="btn-gerar-pdf" class="btn btn-primary">
+            <button id="btn-gerar-pdf" class="ui-btn ui-btn-primary">
               <span class="btn-label">📄 Gerar PDF</span>
               <div class="spinner"></div>
             </button>
-            <button id="btn-imprimir" class="btn btn-secondary">🖨️ Imprimir</button>
+            <button id="btn-imprimir" class="ui-btn ui-btn-secondary">🖨️ Imprimir</button>
           </div>
         </div>
       </div>
 
       <!-- Filtros -->
-      <div class="card fade-in no-print" style="margin-bottom:20px;">
+      <div class="ui-panel fade-in no-print" style="margin-bottom:20px;">
         <div style="padding:14px 20px;">
           <div class="action-bar" style="margin-bottom:0;">
             <div class="action-bar-left">
@@ -130,26 +130,26 @@
 
       <!-- Resumo -->
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;" class="fade-in">
-        <div class="card card-padded" style="border-top:3px solid var(--green-500);">
+        <div class="ui-panel ui-panel-padded" style="border-top:3px solid var(--green-500);">
           <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-300);margin-bottom:8px;">✅ Presentes</div>
           <div style="font-family:var(--font-mono);font-size:32px;font-weight:700;color:var(--text-900);line-height:1;" id="relatorio-presentes">—</div>
           <div style="font-size:12px;color:var(--text-500);margin-top:4px;">funcionários bateram ponto</div>
         </div>
-        <div class="card card-padded" style="border-top:3px solid var(--red-500);">
+        <div class="ui-panel ui-panel-padded" style="border-top:3px solid var(--red-500);">
           <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-300);margin-bottom:8px;">❌ Ausentes</div>
           <div style="font-family:var(--font-mono);font-size:32px;font-weight:700;color:var(--text-900);line-height:1;" id="relatorio-ausentes">—</div>
           <div style="font-size:12px;color:var(--text-500);margin-top:4px;">sem registro no período</div>
         </div>
-        <div class="card card-padded" style="border-top:3px solid var(--blue-600);">
+        <div class="ui-panel ui-panel-padded" style="border-top:3px solid var(--blue-600);">
           <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-300);margin-bottom:8px;">📅 Data</div>
           <div style="font-size:14px;font-weight:600;color:var(--text-900);line-height:1.4;" id="relatorio-data">—</div>
         </div>
       </div>
 
       <!-- Gráfico de barras horizontal -->
-      <div class="card fade-in" style="margin-bottom:20px;">
-        <div class="card-header">
-          <div class="card-title">Presença por dia da semana</div>
+      <div class="ui-panel fade-in" style="margin-bottom:20px;">
+        <div class="ui-panel-header">
+          <div class="ui-panel-title">Presença por dia da semana</div>
         </div>
         <div style="padding:20px 24px;">
           <div class="chart-bar-group">
@@ -183,9 +183,9 @@
       </div>
 
       <!-- Tabela completa -->
-      <div class="card fade-in">
-        <div class="card-header">
-          <div class="card-title">📋 Registro completo de frequência</div>
+      <div class="ui-panel fade-in">
+        <div class="ui-panel-header">
+          <div class="ui-panel-title">📋 Registro completo de frequência</div>
           <span style="font-size:12px;color:var(--text-300);">Todos os funcionários</span>
         </div>
         <div class="table-wrap">
@@ -206,14 +206,14 @@
       </div>
 
       <!-- Observações -->
-      <div class="card no-print fade-in" style="margin-top:20px;margin-bottom:32px;">
-        <div class="card-header">
-          <div class="card-title">📝 Observações</div>
+      <div class="ui-panel no-print fade-in" style="margin-top:20px;margin-bottom:32px;">
+        <div class="ui-panel-header">
+          <div class="ui-panel-title">📝 Observações</div>
         </div>
         <div style="padding:16px 24px;">
           <textarea class="field-textarea" placeholder="Adicione anotações sobre o período..."></textarea>
           <div style="margin-top:12px;">
-            <button class="btn btn-ghost btn-sm" onclick="toast('Observação salva!','success')">💾 Salvar observação</button>
+            <button class="ui-btn ui-btn-ghost ui-btn-sm" onclick="toast('Observação salva!','success')">💾 Salvar observação</button>
           </div>
         </div>
       </div>
@@ -232,9 +232,11 @@
   <script src="/assets/js/admin/06-reports.js"></script>
   <script src="/assets/js/admin/07-register.js"></script>
   <script src="/assets/js/admin/08-settings-login.js"></script>
-  <script src="/assets/js/admin/09-bootstrap.js"></script>
+  <script src="/assets/js/admin/09-init.js"></script>
 </body>
 </html>
+
+
 
 
 

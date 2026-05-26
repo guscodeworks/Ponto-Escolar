@@ -105,7 +105,7 @@
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;" class="profile-cols">
 
         <!-- Dados pessoais -->
-        <div class="card card-padded fade-in">
+        <div class="ui-panel ui-panel-padded fade-in">
           <div class="profile-section-title" style="margin-bottom:18px;">📋 Dados Pessoais</div>
           <div class="profile-field-grid">
             <div class="profile-field">
@@ -140,7 +140,7 @@
         </div>
 
         <!-- Alterar senha -->
-        <div class="card card-padded fade-in">
+        <div class="ui-panel ui-panel-padded fade-in">
           <div class="profile-section-title" style="margin-bottom:18px;">🔒 Alterar Senha</div>
 
           <div class="pw-form">
@@ -182,10 +182,10 @@
             </div>
 
             <div class="pw-form-actions">
-              <button class="btn btn-primary" onclick="alterarSenha()">
+              <button class="ui-btn ui-btn-primary" onclick="alterarSenha()">
                 🔒 Salvar nova senha
               </button>
-              <button class="btn btn-ghost" onclick="limparForm()">
+              <button class="ui-btn ui-btn-ghost" onclick="limparForm()">
                 Cancelar
               </button>
             </div>
@@ -195,7 +195,7 @@
       </div>
 
       <!-- Jornada de trabalho -->
-      <div class="card card-padded fade-in" style="margin-top:24px;">
+      <div class="ui-panel ui-panel-padded fade-in" style="margin-top:24px;">
         <div class="profile-section-title" style="margin-bottom:18px;">🕐 Jornada de Trabalho</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
           <div class="profile-field">
@@ -227,7 +227,7 @@
 
       <!-- Botão sair -->
       <div style="margin-top:24px;padding-bottom:40px;" class="fade-in">
-        <button class="btn btn-ghost" onclick="sair()" style="color:var(--red-600);border-color:rgba(239,68,68,0.2);">
+        <button class="ui-btn ui-btn-ghost" onclick="sair()" style="color:var(--red-600);border-color:rgba(239,68,68,0.2);">
           ⎋ Sair do sistema
         </button>
       </div>
@@ -387,5 +387,6 @@ checkCols();
 </script>
 </body>
 </html>
+
 
 
