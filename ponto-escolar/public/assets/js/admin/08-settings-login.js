@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    PDF / IMPRESSÃO
    ============================================================ */
 
@@ -33,130 +33,95 @@ function iniciarConfiguracoes() {
 }
 
 /* ============================================================
-   LOGIN
+   AUTENTICAÇÃO — GOV.BR
+   Chave compartilhada com ponto-login.html
    ============================================================ */
 
 const ADMIN_AUTH_STORAGE_KEY = 'ponto_escolar_auth';
 
+/**
+ * Lê a sessão salva pelo fluxo GOV.BR em ponto-login.html.
+ * Retorna { token, admin } ou null se não houver sessão válida.
+ */
 function carregarAuthAdmin() {
   try {
-    const auth = JSON.parse(localStorage.getItem(ADMIN_AUTH_STORAGE_KEY) || '{}');
-    return typeof auth.token === 'string' && auth.token ? auth : null;
-  } catch (_error) {
+    const raw = localStorage.getItem(ADMIN_AUTH_STORAGE_KEY)
+             || sessionStorage.getItem(ADMIN_AUTH_STORAGE_KEY)
+             || '{}';
+    const auth = JSON.parse(raw);
+    return (typeof auth.token === 'string' && auth.token) ? auth : null;
+  } catch (_e) {
     return null;
   }
 }
 
+/**
+ * Salva (ou atualiza) a sessão no localStorage e sessionStorage.
+ */
 function salvarAuthAdmin(token, admin) {
-  localStorage.setItem(ADMIN_AUTH_STORAGE_KEY, JSON.stringify({ token, admin }));
+  const payload = JSON.stringify({ token, admin });
+  localStorage.setItem(ADMIN_AUTH_STORAGE_KEY, payload);
+  sessionStorage.setItem(ADMIN_AUTH_STORAGE_KEY, payload);
 }
 
+/**
+ * Remove completamente a sessão de ambos os storages.
+ */
 function limparAuthAdmin() {
   localStorage.removeItem(ADMIN_AUTH_STORAGE_KEY);
+  sessionStorage.removeItem(ADMIN_AUTH_STORAGE_KEY);
 }
 
-async function validarSessaoAdmin() {
-  const path = window.location.pathname || '';
+/**
+ * Resolve o caminho relativo até ponto-login.html a partir de qualquer
+ * página dentro da pasta admin/.
+ */
+function caminhoLogin() {
+  // Todas as páginas admin estão em admin/ → um nível acima é a raiz
+  return '../ponto-login.html';
+}
 
-  if (path === '/admin/login') {
-    limparAuthAdmin();
-    return true;
-  }
-
-  if (!path.startsWith('/admin')) {
-    return true;
-  }
-
+/**
+ * Guard de rota: verifica se existe uma sessão GOV.BR válida.
+ * Se não houver, redireciona para ponto-login.html e retorna false.
+ */
+function validarSessaoAdmin() {
   const auth = carregarAuthAdmin();
-  const headers = { Accept: 'application/json' };
 
-  if (auth?.token) {
-    headers.Authorization = `Bearer ${auth.token}`;
-  }
-
-  try {
-    const response = await fetch('/api/admin/auth/me', {
-      credentials: 'same-origin',
-      headers
-    });
-    const payload = await response.json().catch(() => ({}));
-
-    if (!response.ok || !payload.data?.admin) {
-      throw new Error('Sessao invalida');
-    }
-
-    ADMIN.nome = payload.data.admin.nome || ADMIN.nome;
-    if (auth?.token) {
-      salvarAuthAdmin(auth.token, payload.data.admin);
-    }
-    return true;
-  } catch (_error) {
-    limparAuthAdmin();
-    window.location.href = '/admin/login';
+  if (!auth) {
+    // Sem sessão: redireciona para a tela inicial (GOV.BR login)
+    window.location.replace(caminhoLogin());
     return false;
   }
+
+  // Sessão válida: popula estado global se disponível
+  if (typeof ADMIN !== 'undefined' && auth.admin) {
+    ADMIN.nome = auth.admin.nome || ADMIN.nome;
+    ADMIN.cpf  = auth.admin.cpf  || '';
+  }
+
+  return true;
 }
 
+/**
+ * iniciarLogin: mantida por compatibilidade com 09-init.js.
+ * O login local foi removido — autenticação é feita pelo GOV.BR.
+ */
 function iniciarLogin() {
-  const form = document.getElementById('form-login');
-  if (!form) return;
-  form.addEventListener('submit', async e => {
-    e.preventDefault();
-    const btn = form.querySelector('#btn-login');
-    const email = document.getElementById('login-user')?.value?.trim() || '';
-    const senha = document.getElementById('login-senha')?.value || '';
-
-    limparAuthAdmin();
-
-    if (btn) {
-      btn.disabled = true;
-      btn.classList.add('loading');
-    }
-
-    try {
-      const response = await fetch('/auth/admin/login', {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ email, senha })
-      });
-      const payload = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        throw new Error(payload.message || 'E-mail ou senha incorretos');
-      }
-
-      if (!payload.token) {
-        throw new Error('Resposta de login invalida');
-      }
-
-      salvarAuthAdmin(payload.token, { email });
-      window.location.href = '/admin/dashboard';
-    } catch (error) {
-      await fetch('/auth/admin/logout', { method: 'POST', credentials: 'same-origin' }).catch(() => {});
-      toast(error.message || 'E-mail ou senha incorretos', 'error');
-    } finally {
-      if (btn) {
-        btn.disabled = false;
-        btn.classList.remove('loading');
-      }
-    }
-  });
+  // Login local removido. Autenticação via GOV.BR em ponto-login.html.
 }
 
+/**
+ * Logout: limpa sessão e redireciona para a tela inicial (ponto-login.html).
+ */
 function iniciarLogoutAdmin() {
   document.querySelectorAll('.btn-logout').forEach((button) => {
     button.onclick = null;
     button.removeAttribute('onclick');
-    button.addEventListener('click', async (event) => {
+    button.addEventListener('click', function (event) {
       event.preventDefault();
       limparAuthAdmin();
-
-      try {
-        await fetch('/auth/admin/logout', { method: 'POST', credentials: 'same-origin' });
-      } finally {
-        window.location.href = '/admin/login';
-      }
+      window.location.href = caminhoLogin();
     });
   });
 }
@@ -180,4 +145,3 @@ function iniciarFiltrosFuncionarios() {
 /* ============================================================
    INICIALIZAÇÃO
    ============================================================ */
-
