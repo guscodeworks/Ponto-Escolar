@@ -5,14 +5,8 @@ const path = require('path');
 const helmet = require('helmet');
 const cors = require('cors');
 const env = require('./config/env');
-const apiRoutes = require('./routes');
 const authRoutes = require('./routes/auth');
-const { createPagesRouter } = require('./routes/pages.routes');
-const punchRoutes = require('./routes/punchRoutes');
-const { validateQrCode } = require('./services/qrCodeService');
-const { globalLimiter } = require('./middlewares/rateLimiters');
-const { notFoundMiddleware } = require('./middlewares/notFoundMiddleware');
-const { errorMiddleware } = require('./middlewares/errorMiddleware');
+const { createAdminPagesRouter } = require('./routes/pages/admin.routes');
 
 const app = express();
 const viewsRoot = path.resolve(__dirname, '../views');
@@ -114,7 +108,6 @@ app.use('/assets', express.static(assetsRoot, staticOptions));
 
 app.use(express.json({ limit: '100kb' }));
 app.use(express.urlencoded({ extended: false, limit: '100kb' }));
-app.use(globalLimiter);
 
 app.get('/health', (req, res) => {
   res.status(200).json({ success: true, data: { status: 'ok' } });
@@ -127,18 +120,7 @@ function sendView(res, relativePath) {
   res.sendFile(path.join(viewsRoot, relativePath));
 }
 
-app.use(
-  createPagesRouter({
-    sendView,
-    validateQrCode,
-    schoolUnitCode: env.SCHOOL_UNIT_CODE,
-    noCacheHtmlHeaders
-  })
-);
-
-app.use('/ponto', punchRoutes);
-app.use('/api', apiRoutes);
-app.use(notFoundMiddleware);
-app.use(errorMiddleware);
+app.get('/', (_req, res) => sendView(res, 'index.html'));
+app.use(createAdminPagesRouter({ sendView }));
 
 module.exports = app;

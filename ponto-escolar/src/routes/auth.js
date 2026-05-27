@@ -6,6 +6,7 @@ const rateLimiter = require('../middlewares/rateLimiter');
 
 const router = Router();
 
+router.post('/auth/admin/login', rateLimiter, loginAdmin);
 router.post('/auth/admin/logout', logoutAdmin);
 router.post('/auth/funcionario/login', rateLimiter, loginFuncionario);
 

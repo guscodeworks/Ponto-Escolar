@@ -1,7 +1,7 @@
 ﻿'use strict';
 
-const app = require('./src/app');
-const env = require('./src/config/env');
+const app = require('./src/app.js');
+const env = require('./src/config/env.js');
 const { checkConnection } = require('./src/config/database');
 
 async function startServer() {
