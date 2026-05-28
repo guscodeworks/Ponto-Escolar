@@ -43,7 +43,7 @@
     </nav>
     <div class="sidebar-footer">
 
-      <button class="btn-logout" onclick="window.location.href='../funcionario/login.html'">
+      <button class="btn-logout" data-logout="true">
 
         <span class="nav-icon">⎋</span> Sair do sistema
       </button>
@@ -231,6 +231,40 @@
   <script src="/assets/js/admin/07-register.js"></script>
   <script src="/assets/js/admin/08-settings-login.js"></script>
   <script src="/assets/js/admin/09-init.js"></script>
+
+<script>
+/* ── LOGOUT GOVBR — script inline de segurança ──────────────────
+   Garante que o botão Sair funcione mesmo se os scripts 00-07
+   não estiverem disponíveis no ambiente atual.
+   ──────────────────────────────────────────────────────────── */
+(function () {
+  var AUTH_KEY = "ponto_escolar_auth";
+
+  function fazerLogout() {
+    try { localStorage.removeItem(AUTH_KEY); } catch(_){}
+    try { sessionStorage.removeItem(AUTH_KEY); } catch(_){}
+    window.location.href = "../ponto-login.html";
+  }
+
+  function bindLogout() {
+    document.querySelectorAll(".btn-logout").forEach(function(btn) {
+      btn.onclick = null;
+      btn.removeAttribute("onclick");
+      btn.addEventListener("click", function(e) {
+        e.preventDefault();
+        fazerLogout();
+      });
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bindLogout);
+  } else {
+    bindLogout();
+  }
+})();
+</script>
+
 </body>
 </html>
 

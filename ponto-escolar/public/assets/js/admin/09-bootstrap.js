@@ -1,15 +1,9 @@
-document.addEventListener('DOMContentLoaded', () => {
+﻿document.addEventListener('DOMContentLoaded', () => {
   iniciarRelogio();
-  iniciarLogin(); // mantida por compatibilidade; não faz mais nada
-
-  // Guard de rota: se não houver sessão GOV.BR válida, redireciona para ponto-login.html
-  const sessaoValida = validarSessaoAdmin();
-  if (!sessaoValida) return;
-
   renderizarPerfil();
-  iniciarLogoutAdmin();
   iniciarSidebar();
   iniciarTabs();
+  iniciarLogin();
 
   renderizarStats();
   renderizarUltimosRegistros();
@@ -28,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnImprimir) btnImprimir.addEventListener('click', imprimirRelatorio);
 
   // Modal fechar ao clicar fora
-  document.querySelectorAll('.ui-dialog-overlay').forEach(m => {
+  document.querySelectorAll('.modal-overlay').forEach(m => {
     m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); });
   });
 });
