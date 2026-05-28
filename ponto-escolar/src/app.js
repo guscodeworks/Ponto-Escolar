@@ -1,6 +1,6 @@
 'use strict';
 
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 
 const express = require('express');
 const path = require('path');
@@ -8,6 +8,7 @@ const helmet = require('helmet');
 const cors = require('cors');
 const session = require('express-session');
 const env = require('./config/env');
+const govbrAuthRoutes = require('./routes/govbrAuth.routes');
 const apiRoutes = require('./routes');
 const { createPagesRouter } = require('./routes/pages.routes');
 const punchRoutes = require('./routes/punchRoutes');
@@ -118,7 +119,7 @@ app.use(express.json({ limit: '100kb' }));
 app.use(express.urlencoded({ extended: false, limit: '100kb' }));
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
+    secret: env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -133,6 +134,8 @@ app.use(globalLimiter);
 app.get('/health', (req, res) => {
   res.status(200).json({ success: true, data: { status: 'ok' } });
 });
+
+app.use('/auth/govbr', govbrAuthRoutes);
 
 function sendView(res, relativePath) {
   res.set(noCacheHtmlHeaders);

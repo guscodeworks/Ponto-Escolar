@@ -1,14 +1,6 @@
 'use strict';
 
-function getRequiredEnvironmentValue(name) {
-  const value = String(process.env[name] || '').trim();
-
-  if (!value) {
-    throw new Error(`Variavel de ambiente obrigatoria nao configurada: ${name}.`);
-  }
-
-  return value;
-}
+const { getGovbrConfig } = require('../config/govbr');
 
 function getRequiredParameter(value, name) {
   const normalized = String(value || '').trim();
@@ -45,11 +37,12 @@ async function parseJsonResponse(response, operation) {
 }
 
 function buildAuthorizeUrl({ state, codeChallenge }) {
-  const authorizeUrl = new URL(getRequiredEnvironmentValue('GOVBR_AUTHORIZE_URL'));
+  const config = getGovbrConfig();
+  const authorizeUrl = new URL(config.authorizeUrl);
   authorizeUrl.search = new URLSearchParams({
     response_type: 'code',
-    client_id: getRequiredEnvironmentValue('GOVBR_CLIENT_ID'),
-    redirect_uri: getRequiredEnvironmentValue('GOVBR_REDIRECT_URI'),
+    client_id: config.clientId,
+    redirect_uri: config.redirectUri,
     scope: 'openid email profile',
     state: getRequiredParameter(state, 'state'),
     code_challenge: getRequiredParameter(codeChallenge, 'codeChallenge'),
@@ -60,19 +53,16 @@ function buildAuthorizeUrl({ state, codeChallenge }) {
 }
 
 async function trocarCodePorToken({ code, codeVerifier }) {
-  const clientId = getRequiredEnvironmentValue('GOVBR_CLIENT_ID');
-  const clientSecret = getRequiredEnvironmentValue('GOVBR_CLIENT_SECRET');
-  const tokenUrl = getRequiredEnvironmentValue('GOVBR_TOKEN_URL');
-  const redirectUri = getRequiredEnvironmentValue('GOVBR_REDIRECT_URI');
-  const credentials = Buffer.from(`${clientId}:${clientSecret}`, 'utf8').toString('base64');
+  const config = getGovbrConfig();
+  const credentials = Buffer.from(`${config.clientId}:${config.clientSecret}`, 'utf8').toString('base64');
   const body = new URLSearchParams({
     grant_type: 'authorization_code',
     code: getRequiredParameter(code, 'code'),
-    redirect_uri: redirectUri,
+    redirect_uri: config.redirectUri,
     code_verifier: getRequiredParameter(codeVerifier, 'codeVerifier')
   });
 
-  const response = await fetch(tokenUrl, {
+  const response = await fetch(config.tokenUrl, {
     method: 'POST',
     headers: {
       Authorization: `Basic ${credentials}`,
@@ -85,9 +75,10 @@ async function trocarCodePorToken({ code, codeVerifier }) {
 }
 
 async function buscarUserInfo(accessToken) {
+  const config = getGovbrConfig();
   const token = getRequiredParameter(accessToken, 'accessToken');
 
-  const response = await fetch(getRequiredEnvironmentValue('GOVBR_USERINFO_URL'), {
+  const response = await fetch(config.userInfoUrl, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${token}`

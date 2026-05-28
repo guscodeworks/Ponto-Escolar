@@ -1,12 +1,8 @@
 const { Router } = require('express');
-const { loginAdmin, getAdminProfile } = require('../controllers/adminAuthController');
-const { authenticateAdmin } = require('../middlewares/authMiddleware');
-const { loginLimiter } = require('../middlewares/rateLimiters');
-const { adminLoginValidator } = require('../middlewares/validators');
+const { consultarSessaoAdmin } = require('../controllers/govbrAuth.controller');
 
 const router = Router();
 
-router.post('/login', loginLimiter, adminLoginValidator, loginAdmin);
-router.get('/me', authenticateAdmin, getAdminProfile);
+router.get('/me', consultarSessaoAdmin);
 
 module.exports = router;
