@@ -4,8 +4,8 @@ const dotenv = require('dotenv');
 
 dotenv.config({ quiet: true });
 
-const DEFAULT_PORT = 4000;
-const DEFAULT_HOST = 'localhost';
+const DEFAULT_PORT = process.env.PORT;
+const DEFAULT_HOST = process.env.HOST;
 
 function parsePort(value) {
   const raw = String(value || DEFAULT_PORT).trim();
