@@ -9,6 +9,11 @@ const {
   buscarUserInfo
 } = require('../services/govbrAuth.service');
 const { verificarSeUsuarioGovbrEhAdmin } = require('../services/adminAuthorization.service');
+const { buildClearAdminAuthCookie } = require('../utils/authCookie');
+
+function getGovbrFakeHomeUrl() {
+  return String(process.env.GOVBR_FAKE_BASE_URL || 'http://localhost:4000').trim();
+}
 
 function matchesState(receivedState, storedState) {
   const received = Buffer.from(String(receivedState || ''), 'utf8');
@@ -33,6 +38,19 @@ function regenerateSession(req) {
 function saveSession(req) {
   return new Promise((resolve, reject) => {
     req.session.save((error) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+
+      resolve();
+    });
+  });
+}
+
+function destroySession(req) {
+  return new Promise((resolve, reject) => {
+    req.session.destroy((error) => {
       if (error) {
         reject(error);
         return;
@@ -133,16 +151,19 @@ async function concluirLoginGovbr(req, res, next) {
 }
 
 async function sairGovbr(req, res, next) {
+  res.setHeader('Set-Cookie', buildClearAdminAuthCookie());
+  res.clearCookie('connect.sid', { path: '/' });
+
   if (!req.session) {
-    return res.redirect('/');
+    return res.redirect(getGovbrFakeHomeUrl());
   }
 
   try {
     delete req.session.admin;
     delete req.session.oauthGovbr;
-    await saveSession(req);
+    await destroySession(req);
 
-    return res.redirect('/');
+    return res.redirect(getGovbrFakeHomeUrl());
   } catch (error) {
     return next(error);
   }
