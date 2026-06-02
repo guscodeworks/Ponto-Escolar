@@ -56,29 +56,65 @@ function iniciarFormRegistro() {
     const el = document.getElementById(id);
     if (el) { el.addEventListener('input', atualizarPreview); el.addEventListener('change', atualizarPreview); }
   });
-
-  form.addEventListener('submit', e => {
+  form.addEventListener('submit', async e => {
     e.preventDefault();
+  
     const nome  = document.getElementById('input-nome')?.value.trim();
     const email = document.getElementById('input-email')?.value.trim();
-    const cpf   = document.getElementById('input-cpf')?.value.trim();
+    const cpfFormatado = document.getElementById('input-cpf')?.value.trim();
     const cargo = document.getElementById('input-cargo')?.value;
     const tel   = document.getElementById('input-tel')?.value.trim();
-
-    if (!nome || !email || !cpf || !cargo) { toast('Preencha todos os campos obrigatórios.','error'); return; }
-    if (cpf.length < 14) { toast('CPF inválido.','error'); return; }
-
+  
+    const cpf = String(cpfFormatado || '').replace(/\D/g, '');
+  
+    if (!nome || !email || !cpf || !cargo) {
+      toast('Preencha todos os campos obrigatórios.', 'error');
+      return;
+    }
+  
+    if (cpf.length !== 11) {
+      toast('CPF inválido.', 'error');
+      return;
+    }
+  
     const btn = document.getElementById('btn-registrar');
     btn.classList.add('loading');
-
-    setTimeout(() => {
-      const novoId = Math.max(...FUNCIONARIOS.map(f=>f.id)) + 1;
-      FUNCIONARIOS.push({ id:novoId, nome, email, cpf, cargo, tel:tel||'—', status:'ativo', admissao:formatarData(new Date()) });
+  
+    try {
+      const response = await fetch('/api/admin/funcionarios', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify({
+          nome,
+          email,
+          cpf,
+          cargo,
+          tel: tel || null,
+          senha: cpf,
+          ativo: true
+        })
+      });
+  
+      const payload = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(payload?.error?.message || payload?.message || 'Erro ao cadastrar funcionário');
+      }
+  
       toast(`Funcionário "${nome}" cadastrado com sucesso!`, 'success');
       form.reset();
-      btn.classList.remove('loading');
       atualizarPreview();
-    }, 1000);
+  
+    } catch (error) {
+      console.error(error);
+      toast(error.message || 'Erro ao cadastrar funcionário.', 'error');
+    } finally {
+      btn.classList.remove('loading');
+    }
   });
 }
 

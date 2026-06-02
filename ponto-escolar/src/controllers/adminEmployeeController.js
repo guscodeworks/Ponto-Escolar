@@ -14,6 +14,10 @@ function mapEmployee(employee) {
     cpf: maskCpf(employee.cpf),
     nome: employee.nome,
     email: employee.email,
+
+    cargo: employee.cargo || employee.cargo_nome,
+    tel: employee.telefone,
+
     ativo: Boolean(employee.ativo),
     criado_em: employee.criado_em,
     primeiro_acesso: Boolean(employee.primeiro_acesso),
@@ -25,7 +29,19 @@ function mapEmployee(employee) {
 
 async function loadEmployeeById(employeeId) {
   return executeOne(
-    `SELECT f.id, f.cpf, f.nome, f.email, f.ativo, f.criado_em, f.primeiro_acesso, f.cargo_id, f.login_id, c.nome AS cargo_nome
+    `SELECT 
+       f.id,
+       f.cpf,
+       f.nome,
+       f.email,
+       f.ativo,
+       f.criado_em,
+       f.primeiro_acesso,
+       f.cargo_id,
+       f.login_id,
+       f.cargo,
+       f.telefone,
+       c.nome AS cargo_nome
      FROM funcionarios f
      LEFT JOIN cargo c ON c.id = f.cargo_id
      WHERE f.id = ?
@@ -60,11 +76,14 @@ async function createEmployee(req, res, next) {
     const nome = String(req.body.nome || '').trim();
     const cpf = String(req.body.cpf || '').trim();
     const email = String(req.body.email || '').trim().toLowerCase();
+
+    const cargo = String(req.body.cargo || '').trim();
+    const telefone = String(req.body.tel || req.body.telefone || '').trim();
+
     const senha = String(req.body.senha || '');
     const ativo = req.body.ativo === undefined ? true : Boolean(req.body.ativo);
     const requestedCargoId = req.body.cargo_id ? Number(req.body.cargo_id) : null;
     const senhaHash = await bcrypt.hash(senha, 12);
-
     const employeeId = await withTransaction(async (tx) => {
       const cpfExists = await tx.executeOne('SELECT id FROM funcionarios WHERE cpf = ? LIMIT 1 FOR UPDATE', [cpf]);
       if (cpfExists) {
@@ -89,9 +108,21 @@ async function createEmployee(req, res, next) {
       const loginId = Number(loginInsert.insertId);
 
       const result = await tx.execute(
-        `INSERT INTO funcionarios (cpf, nome, email, senha, ativo, primeiro_acesso, cargo_id, login_id)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        [cpf, nome, email, senhaHash, ativo ? 1 : 0, 1, cargoId, loginId]
+        `INSERT INTO funcionarios
+         (cpf, nome, email, senha_hash, ativo, primeiro_acesso, cargo_id, login_id, cargo, telefone)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          cpf,
+          nome,
+          email,
+          senhaHash,
+          ativo ? 1 : 0,
+          1,
+          cargoId || null,
+          loginId || null,
+          cargo,
+          telefone || null
+        ]
       );
       return result.insertId;
     });
@@ -149,7 +180,19 @@ async function listEmployees(req, res, next) {
     );
 
     const employees = await execute(
-      `SELECT f.id, f.cpf, f.nome, f.email, f.ativo, f.criado_em, f.primeiro_acesso, f.cargo_id, f.login_id, c.nome AS cargo_nome
+      `SELECT 
+          f.id,
+          f.cpf,
+          f.nome,
+          f.email,
+          f.ativo,
+          f.criado_em,
+          f.primeiro_acesso,
+          f.cargo_id,
+          f.login_id,
+          f.cargo,
+          f.telefone,
+          c.nome AS cargo_nome
        FROM funcionarios f
        LEFT JOIN cargo c ON c.id = f.cargo_id
        ${whereClause}
@@ -157,7 +200,7 @@ async function listEmployees(req, res, next) {
        LIMIT ? OFFSET ?`,
       [...params, limit, offset]
     );
-
+    
     return res.status(200).json({
       success: true,
       data: {

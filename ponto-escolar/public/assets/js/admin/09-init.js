@@ -15,7 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
   renderizarUltimosRegistros();
   renderizarGrafico();
   renderizarAlertas();
-  renderizarFuncionarios();
+  if (document.getElementById('tbody-funcionarios')) {
+    carregarFuncionariosDoBanco();
+  } else {
+    renderizarFuncionarios();
+  }
   iniciarFiltrosFuncionarios();
   renderizarPontosHoje();
   renderizarRelatorio();
