@@ -27,7 +27,7 @@ btn.addEventListener("click", async () => {
         }
 
         alert("Login realizado com sucesso!");
-        window.location.href = "/";
+        window.location.href = "/visual.html";
     } catch (error) {
         alert(error.message || "Falha no login fake.");
         btn.disabled = false;

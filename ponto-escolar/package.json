@@ -5,6 +5,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "start:ponto": "node server.js",
+    "start:govbr": "npm --prefix ../gov.br-fake start",
+    "dev": "concurrently -n PONTO,GOVBR \"npm run start:ponto\" \"npm run start:govbr\"",
     "db:init": "node src/scripts/initDatabase.js",
     "db:run": "node src/scripts/runSqlFile.js",
     "admin:create": "node src/scripts/createAdmin.js"
@@ -13,7 +16,6 @@
     "bcrypt": "^6.0.0",
     "body-parser": "^2.2.2",
     "cors": "^2.8.6",
-    "crypto": "^1.0.1",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-rate-limit": "^8.5.1",
@@ -22,7 +24,9 @@
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.22.3",
-    "path": "^0.12.7",
     "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.3"
   }
 }

@@ -12,7 +12,6 @@ const {
   UnauthorizedError
 } = require('../utils/errors');
 const { registerAuditLog } = require('../services/auditLogService');
-const { validateQrCode } = require('../services/qrCodeService');
 
 const PUNCH_TYPES = ['ENTRADA', 'SAIDA_ALMOCO', 'VOLTA_ALMOCO', 'SAIDA'];
 const EMPTY_PUNCH_TIME = '00:00:00';
@@ -133,34 +132,6 @@ function mapFuncionario(funcionario) {
   };
 }
 
-function getRequestQrCode(req) {
-  return String(req.body.qrCode || req.body.qr_code || req.body.qrToken || '').trim();
-}
-
-async function ensureValidDailyQrCode(req, { evento, ipOrigem, funcionarioId = null, login = null } = {}) {
-  const qrCode = getRequestQrCode(req);
-  const validation = await validateQrCode(qrCode, { unidadeCodigo: env.SCHOOL_UNIT_CODE });
-
-  if (validation.valid) {
-    return;
-  }
-
-  await registerAuditLog({
-    evento,
-    nivel: 'WARN',
-    funcionarioId,
-    mensagem: 'Tentativa com QR Code invalido ou expirado',
-    ipOrigem,
-    metadados: {
-      login,
-      status_qr: validation.status,
-      token_hint: qrCode ? qrCode.slice(0, 12) : null
-    }
-  });
-
-  throw new ForbiddenError('QR Code invalido ou expirado. Solicite um novo acesso.');
-}
-
 async function loginFuncionario(req, res, next) {
   try {
     const rawLogin = String(req.body.login || req.body.email || req.body.cpf || '').trim();
@@ -172,12 +143,6 @@ async function loginFuncionario(req, res, next) {
     if (!rawLogin) {
       throw new BadRequestError('Informe CPF ou email');
     }
-
-    await ensureValidDailyQrCode(req, {
-      evento: 'funcionario_login_qr_invalido',
-      ipOrigem,
-      login: email || maskCpf(cpf)
-    });
 
     const funcionario = await executeOne(
       `SELECT id, cpf, nome, email, senha, ativo
@@ -236,12 +201,6 @@ async function registerPunch(req, res, next) {
     const longitude = Number(req.body.longitude);
     const ipOrigem = getClientIp(req);
     const userAgent = getClientUserAgent(req);
-
-    await ensureValidDailyQrCode(req, {
-      evento: 'batida_ponto_qr_invalido',
-      ipOrigem,
-      funcionarioId: req.auth?.id || null
-    });
 
     if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
       throw new BadRequestError('Localizacao invalida para registro de ponto');

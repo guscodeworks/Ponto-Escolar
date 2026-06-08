@@ -12,7 +12,6 @@ const govbrAuthRoutes = require('./routes/govbrAuth.routes');
 const apiRoutes = require('./routes');
 const { createPagesRouter } = require('./routes/pages.routes');
 const punchRoutes = require('./routes/punchRoutes');
-const { validateQrCode } = require('./services/qrCodeService');
 const { globalLimiter } = require('./middlewares/rateLimiters');
 const { notFoundMiddleware } = require('./middlewares/notFoundMiddleware');
 const { errorMiddleware } = require('./middlewares/errorMiddleware');
@@ -21,9 +20,6 @@ const app = express();
 const viewsRoot = path.resolve(__dirname, '../views');
 const publicRoot = path.join(__dirname, '../public');
 const assetsRoot = path.join(publicRoot, 'assets');
-const assetsCssRoot = path.join(assetsRoot, 'css');
-const assetsJsRoot = path.join(assetsRoot, 'js');
-const assetsImgRoot = path.join(assetsRoot, 'img');
 const staticOptions = {
   maxAge: '1h'
 };
@@ -143,14 +139,7 @@ function sendView(res, relativePath) {
   res.sendFile(path.join(viewsRoot, relativePath));
 }
 
-app.use(
-  createPagesRouter({
-    sendView,
-    validateQrCode,
-    schoolUnitCode: env.SCHOOL_UNIT_CODE,
-    noCacheHtmlHeaders
-  })
-);
+app.use(createPagesRouter({ sendView }));
 
 app.use('/ponto', punchRoutes);
 app.use('/api', apiRoutes);

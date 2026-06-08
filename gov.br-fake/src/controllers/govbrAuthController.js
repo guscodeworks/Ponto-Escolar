@@ -10,6 +10,7 @@ const fakeUserService = require('../services/fakeUserService');
 const memoryStore = require('../repositories/memoryStore');
 
 const FAKE_SESSION_COOKIE = 'govbr_fake_session';
+const POST_LOGIN_REDIRECT_PATH = '/visual.html';
 
 function requestError(message, statusCode = 400, code = 'INVALID_REQUEST') {
   return new AppError(message, statusCode, code);
@@ -219,16 +220,7 @@ function login(req, res, next) {
     }
 
     createFakeSession(res);
-
-    if (req.accepts(['html', 'json']) === 'html') {
-      return res.redirect('/');
-    }
-
-    return res.status(200).json({
-      success: true,
-      authenticated: true,
-      user: getFakeAdminUserInfo()
-    });
+    return res.redirect(303, POST_LOGIN_REDIRECT_PATH);
   } catch (error) {
     return next(error);
   }
@@ -359,6 +351,7 @@ function showUserInfo(req, res) {
 module.exports = {
   showAuthorize,
   login,
+  getAuthenticatedUser,
   logout,
   showSession,
   exchangeToken,
