@@ -23,17 +23,32 @@ const { loginFuncionario, registerPunch } = require('../controllers/punchControl
 const { authenticateFuncionario } = require('../middlewares/authMiddleware');
 const { requireRole } = require('../middlewares/role.middleware');
 const { validate } = require('../middlewares/validate.middleware');
-const { pointLimiter } = require('../middlewares/rateLimiters');
+const { loginLimiter, pointLimiter } = require('../middlewares/rateLimiters');
 const { funcionarioLoginSchema, baterPontoSchema } = require('../schemas/auth.schema');
 const { MethodNotAllowedError } = require('../utils/errors');
 
 const router = Router();
 
+function attachPunchQrFromSession(req, _res, next) {
+  const bodyQrCode = String(req.body?.qrCode || req.body?.qr_code || req.body?.qrToken || '').trim();
+  const sessionQrCode = String(req.session?.punchAccess?.qrCode || '').trim();
+
+  if (!bodyQrCode && sessionQrCode) {
+    req.body = {
+      ...req.body,
+      qrCode: sessionQrCode
+    };
+  }
+
+  return next();
+}
+
 // ─── POST /ponto/login ────────────────────────────────────────────────────────
 // validate(funcionarioLoginSchema) substitui funcionarioLoginValidator
 router.post(
   '/login',
-  pointLimiter,
+  loginLimiter,
+  attachPunchQrFromSession,
   validate(funcionarioLoginSchema),
   loginFuncionario
 );
@@ -47,6 +62,7 @@ router.post(
   pointLimiter,
   authenticateFuncionario,
   requireRole(['funcionario']),
+  attachPunchQrFromSession,
   validate(baterPontoSchema),
   registerPunch
 );
@@ -58,6 +74,7 @@ router.post(
   pointLimiter,
   authenticateFuncionario,
   requireRole(['funcionario']),
+  attachPunchQrFromSession,
   validate(baterPontoSchema),
   registerPunch
 );

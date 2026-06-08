@@ -80,9 +80,19 @@ function getFakeBaseUrl() {
   return getOptionalValue('GOVBR_FAKE_BASE_URL').replace(/\/+$/, '');
 }
 
+function isProduction() {
+  return String(process.env.NODE_ENV || 'development').trim().toLowerCase() === 'production';
+}
+
 function requireAtLeastOneAdminIdentifier(adminSubs, adminEmails) {
   if (adminSubs.length === 0 && adminEmails.length === 0) {
     throwConfigError('"ADMIN_GOVBR_SUBS" or "ADMIN_GOVBR_EMAILS" must include at least one value');
+  }
+}
+
+function requireProductionAdminSub(adminSubs) {
+  if (isProduction() && adminSubs.length === 0) {
+    throwConfigError('"ADMIN_GOVBR_SUBS" must include at least one sub in production');
   }
 }
 
@@ -107,23 +117,72 @@ function getUserInfoUrl(fakeBaseUrl) {
   );
 }
 
+function getClientId() {
+  return isProduction()
+    ? getRequiredValue('GOVBR_CLIENT_ID')
+    : getRequiredFallbackValue('GOVBR_FAKE_CLIENT_ID', 'GOVBR_CLIENT_ID');
+}
+
+function getClientSecret() {
+  return isProduction()
+    ? getRequiredValue('GOVBR_CLIENT_SECRET')
+    : getRequiredFallbackValue('GOVBR_FAKE_CLIENT_SECRET', 'GOVBR_CLIENT_SECRET');
+}
+
+function getRedirectUri() {
+  return isProduction()
+    ? getRequiredUrl('GOVBR_REDIRECT_URI')
+    : getOptionalUrl('GOVBR_FAKE_REDIRECT_URI', process.env.GOVBR_REDIRECT_URI);
+}
+
+function assertProductionProvider(config) {
+  if (!isProduction()) {
+    return;
+  }
+
+  const providerUrls = [config.authorizeUrl, config.tokenUrl, config.userInfoUrl];
+  providerUrls.forEach((value) => {
+    const url = new URL(value);
+    const host = url.hostname.toLowerCase();
+    const path = url.pathname.toLowerCase();
+
+    if (url.protocol !== 'https:') {
+      throwConfigError('Gov.br URLs must use HTTPS in production');
+    }
+    if (host === 'localhost' || host === '127.0.0.1' || host === '::1') {
+      throwConfigError('Local Gov.br provider URLs are not allowed in production');
+    }
+    if (path.includes('/fake-govbr')) {
+      throwConfigError('The fake Gov.br provider is not allowed in production');
+    }
+  });
+
+  if (config.clientSecret === 'dev-secret') {
+    throwConfigError('Development Gov.br client secret is not allowed in production');
+  }
+}
+
 function getGovbrConfig() {
   const fakeBaseUrl = getFakeBaseUrl();
   const adminSubs = getAdminSubs();
   const adminEmails = getAdminEmails();
 
   requireAtLeastOneAdminIdentifier(adminSubs, adminEmails);
+  requireProductionAdminSub(adminSubs);
 
-  return Object.freeze({
+  const config = {
     authorizeUrl: getAuthorizeUrl(fakeBaseUrl),
     tokenUrl: getTokenUrl(fakeBaseUrl),
     userInfoUrl: getUserInfoUrl(fakeBaseUrl),
-    clientId: getRequiredFallbackValue('GOVBR_FAKE_CLIENT_ID', 'GOVBR_CLIENT_ID'),
-    clientSecret: getRequiredFallbackValue('GOVBR_FAKE_CLIENT_SECRET', 'GOVBR_CLIENT_SECRET'),
-    redirectUri: getOptionalUrl('GOVBR_FAKE_REDIRECT_URI', process.env.GOVBR_REDIRECT_URI),
+    clientId: getClientId(),
+    clientSecret: getClientSecret(),
+    redirectUri: getRedirectUri(),
     adminSubs: Object.freeze(adminSubs),
     adminEmails: Object.freeze(adminEmails)
-  });
+  };
+
+  assertProductionProvider(config);
+  return Object.freeze(config);
 }
 
 module.exports = {

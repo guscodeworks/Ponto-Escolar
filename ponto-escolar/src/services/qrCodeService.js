@@ -4,6 +4,7 @@ const { isValidTokenFormat } = require('../utils/token');
 
 const QR_CONTEXT = 'BATIDA_PONTO';
 const SAO_PAULO_TIMEZONE = 'America/Sao_Paulo';
+const QR_TOKEN_TTL_MS = 10 * 60 * 1000;
 
 function getSaoPauloDateParts(referenceDate = new Date()) {
   const formatter = new Intl.DateTimeFormat('sv-SE', {
@@ -37,6 +38,18 @@ function getNextSaoPauloMidnight(referenceDate = new Date()) {
   return new Date(Date.UTC(year, month - 1, day + 1, 3, 0, 0, 0));
 }
 
+function getTokenWindow(referenceDate = new Date()) {
+  const timestamp = referenceDate.getTime();
+  const windowStartMs = Math.floor(timestamp / QR_TOKEN_TTL_MS) * QR_TOKEN_TTL_MS;
+  const windowEndMs = windowStartMs + QR_TOKEN_TTL_MS;
+
+  return {
+    key: String(windowStartMs),
+    startsAt: new Date(windowStartMs),
+    expiresAt: new Date(windowEndMs)
+  };
+}
+
 function toMysqlDateTime(date) {
   return date.toISOString().slice(0, 19).replace('T', ' ');
 }
@@ -49,7 +62,8 @@ function getUnitCode(unidadeCodigo = env.SCHOOL_UNIT_CODE) {
 function getDailyToken({ unidadeCodigo = env.SCHOOL_UNIT_CODE, referenceDate = new Date() } = {}) {
   const unitCode = getUnitCode(unidadeCodigo);
   const dayKey = getSaoPauloDayKey(referenceDate);
-  const payload = `${dayKey}:${unitCode}`;
+  const tokenWindow = getTokenWindow(referenceDate);
+  const payload = `${dayKey}:${unitCode}:${tokenWindow.key}`;
   return crypto.createHmac('sha256', env.JWT_SECRET).update(payload).digest('hex');
 }
 
@@ -88,9 +102,8 @@ function mapQrCode(row, includeSecret = false) {
 function buildDailyQrPayload({ unidadeCodigo = env.SCHOOL_UNIT_CODE, baseUrl = '', referenceDate = new Date() } = {}) {
   const qrCode = getDailyToken({ unidadeCodigo, referenceDate });
   const dayKey = getSaoPauloDayKey(referenceDate);
-  const id = Number(dayKey.replace(/-/g, ''));
-  const now = referenceDate;
-  const expirationDate = getNextSaoPauloMidnight(referenceDate);
+  const tokenWindow = getTokenWindow(referenceDate);
+  const id = Number(`${dayKey.replace(/-/g, '')}${String(Math.floor(tokenWindow.startsAt.getTime() / QR_TOKEN_TTL_MS)).slice(-4)}`);
   const path = `/ponto/acessar?qr_code=${qrCode}`;
 
   return {
@@ -98,9 +111,9 @@ function buildDailyQrPayload({ unidadeCodigo = env.SCHOOL_UNIT_CODE, baseUrl = '
     token_hint: qrCode.slice(0, 12),
     contexto: QR_CONTEXT,
     unidade_codigo: getUnitCode(unidadeCodigo),
-    valido_de: toMysqlDateTime(now),
-    expira_em: toMysqlDateTime(expirationDate),
-    criado_em: toMysqlDateTime(now),
+    valido_de: toMysqlDateTime(tokenWindow.startsAt),
+    expira_em: toMysqlDateTime(tokenWindow.expiresAt),
+    criado_em: toMysqlDateTime(referenceDate),
     qr_code: qrCode,
     url: baseUrl ? `${baseUrl.replace(/\/$/, '')}${path}` : path
   };

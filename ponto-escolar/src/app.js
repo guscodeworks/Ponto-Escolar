@@ -119,13 +119,15 @@ app.use(express.json({ limit: '100kb' }));
 app.use(express.urlencoded({ extended: false, limit: '100kb' }));
 app.use(
   session({
+    name: 'ponto_escolar_sid',
     secret: env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
       sameSite: 'lax',
-      secure: env.IS_PRODUCTION
+      secure: env.IS_PRODUCTION,
+      maxAge: 8 * 60 * 60 * 1000
     }
   })
 );

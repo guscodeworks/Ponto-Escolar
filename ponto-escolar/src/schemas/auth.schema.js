@@ -129,6 +129,16 @@ const baterPontoSchema = z.object({
       qrCode:  qrCodeField.optional(),
       qr_code: z.string().optional(),
       qrToken: z.string().optional(),
+      accuracy: z
+        .number({ invalid_type_error: 'Precisao da localizacao deve ser numero' })
+        .min(0, 'Precisao da localizacao invalida')
+        .max(10000, 'Precisao da localizacao invalida')
+        .optional(),
+      locationAccuracy: z
+        .number({ invalid_type_error: 'Precisao da localizacao deve ser numero' })
+        .min(0, 'Precisao da localizacao invalida')
+        .max(10000, 'Precisao da localizacao invalida')
+        .optional(),
 
       latitude: z
         .number({ required_error: 'Latitude é obrigatória', invalid_type_error: 'Latitude deve ser número' })

@@ -137,12 +137,62 @@ function getRequestQrCode(req) {
   return String(req.body.qrCode || req.body.qr_code || req.body.qrToken || '').trim();
 }
 
+function getSessionQrCode(req) {
+  return String(req.session?.punchAccess?.qrCode || '').trim();
+}
+
+function getLocationAccuracy(req) {
+  const value = req.body.locationAccuracy ?? req.body.accuracy;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
+}
+
+function buildPunchRiskFlags(req, distanceCheck, locationAccuracyMeters) {
+  const flags = [];
+  const sessionQrCode = getSessionQrCode(req);
+
+  if (!sessionQrCode) {
+    flags.push('QR_NOT_BOUND_TO_BACKEND_SESSION');
+  }
+
+  if (locationAccuracyMeters === null) {
+    flags.push('LOCATION_ACCURACY_NOT_PROVIDED');
+  } else if (locationAccuracyMeters > 50) {
+    flags.push('LOCATION_LOW_ACCURACY');
+  }
+
+  if (Number(distanceCheck.distanceMeters) > env.ALLOWED_RADIUS_METERS * 0.9) {
+    flags.push('LOCATION_NEAR_ALLOWED_RADIUS_LIMIT');
+  }
+
+  return flags;
+}
+
 async function ensureValidDailyQrCode(req, { evento, ipOrigem, funcionarioId = null, login = null } = {}) {
   const qrCode = getRequestQrCode(req);
+  const sessionQrCode = getSessionQrCode(req);
+
+  if (sessionQrCode && qrCode && sessionQrCode !== qrCode) {
+    await registerAuditLog({
+      evento,
+      nivel: 'WARN',
+      funcionarioId,
+      mensagem: 'Tentativa com QR Code diferente do QR validado na sessao',
+      ipOrigem,
+      metadados: {
+        login,
+        token_hint: qrCode.slice(0, 12),
+        session_token_hint: sessionQrCode.slice(0, 12)
+      }
+    });
+
+    throw new ForbiddenError('QR Code invalido ou expirado. Solicite um novo acesso.');
+  }
+
   const validation = await validateQrCode(qrCode, { unidadeCodigo: env.SCHOOL_UNIT_CODE });
 
   if (validation.valid) {
-    return;
+    return validation;
   }
 
   await registerAuditLog({
@@ -234,6 +284,7 @@ async function registerPunch(req, res, next) {
   try {
     const latitude = Number(req.body.latitude);
     const longitude = Number(req.body.longitude);
+    const locationAccuracyMeters = getLocationAccuracy(req);
     const ipOrigem = getClientIp(req);
     const userAgent = getClientUserAgent(req);
 
@@ -248,6 +299,7 @@ async function registerPunch(req, res, next) {
     }
 
     const distanceCheck = validateLocation(latitude, longitude);
+    const riskFlags = buildPunchRiskFlags(req, distanceCheck, locationAccuracyMeters);
     const { date, time, dateTime } = getSaoPauloDateTime(new Date());
 
     const punch = await withTransaction(async (tx) => {
@@ -313,7 +365,9 @@ async function registerPunch(req, res, next) {
         sequence,
         type,
         registeredAt: dateTime,
-        distanceMeters: distanceCheck.distanceMeters
+        distanceMeters: distanceCheck.distanceMeters,
+        locationAccuracyMeters,
+        riskFlags
       };
     });
 
@@ -326,6 +380,9 @@ async function registerPunch(req, res, next) {
         sequencia: punch.sequence,
         tipo: punch.type,
         distancia_metros: punch.distanceMeters,
+        precisao_localizacao_metros: punch.locationAccuracyMeters,
+        riscos: punch.riskFlags,
+        qr_vinculado_sessao: Boolean(getSessionQrCode(req)),
         latitude,
         longitude,
         user_agent: userAgent

@@ -14,6 +14,13 @@ const WEAK_JWT_SECRETS = new Set([
   "default",
 ]);
 
+const WEAK_SESSION_SECRETS = new Set([
+  ...WEAK_JWT_SECRETS,
+  "trocar_por_um_segredo_forte",
+  "change_this_session_secret",
+  "session_secret",
+]);
+
 function throwEnvError(message) {
   const error = new Error(`Invalid environment configuration: ${message}`);
   error.name = "EnvValidationError";
@@ -77,6 +84,25 @@ function validateJwtSecret(secret) {
   }
   if (!hasStrongEntropy(normalized)) {
     throwEnvError('"JWT_SECRET" must include mixed character types');
+  }
+  return normalized;
+}
+
+function validateSessionSecret(secret, isProduction) {
+  const normalized = secret.trim();
+
+  if (!isProduction) {
+    return normalized;
+  }
+
+  if (normalized.length < 48) {
+    throwEnvError('"SESSION_SECRET" must be at least 48 characters in production');
+  }
+  if (WEAK_SESSION_SECRETS.has(normalized.toLowerCase())) {
+    throwEnvError('"SESSION_SECRET" is too weak for production');
+  }
+  if (!hasStrongEntropy(normalized)) {
+    throwEnvError('"SESSION_SECRET" must include mixed character types in production');
   }
   return normalized;
 }
@@ -162,7 +188,7 @@ const env = {
   FUNCIONARIO_JWT_EXPIRES_IN: validateJwtExpiresIn(
     process.env.FUNCIONARIO_JWT_EXPIRES_IN || "20m"
   ),
-  SESSION_SECRET: getRequiredVar("SESSION_SECRET"),
+  SESSION_SECRET: validateSessionSecret(getRequiredVar("SESSION_SECRET"), IS_PRODUCTION),
   SCHOOL_LATITUDE: schoolLatitude,
   SCHOOL_LONGITUDE: schoolLongitude,
   SCHOOL_UNIT_CODE: (process.env.SCHOOL_UNIT_CODE || "DEFAULT").trim(),
