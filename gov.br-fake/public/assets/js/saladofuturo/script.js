@@ -1,3 +1,4 @@
+require('dotenv').config();
 const serverBtn = document.getElementById("serverBtn");
 const loginBox = document.querySelector(".login-box");
 const greeting = loginBox ? loginBox.querySelector("h1") : null;
@@ -52,7 +53,7 @@ function aplicarSessao(session) {
 
 serverBtn.addEventListener("click", () => {
     if(authenticatedUser){
-        window.location.href = "http://localhost:3000/admin/auth/start";
+        window.location.href = process.env.API_URL;
         return;
     }
 

@@ -3,6 +3,7 @@ const { isValidCpf, normalizeCpf } = require('../utils/cpf');
 const { validateRequest } = require('./validateRequest');
 
 const QR_TOKEN_REGEX = /^[a-f0-9]{64}$/i;
+const QR_ACCESS_PATH_REGEX = /^\/?ponto\/acessar\/?$/i;
 
 function withValidation(rules) {
   return [...rules, validateRequest];
@@ -35,9 +36,25 @@ function qrCodeRule() {
     .customSanitizer(getQrCodeCandidate)
     .trim()
     .notEmpty()
-    .withMessage('QR Code e obrigatorio')
-    .matches(QR_TOKEN_REGEX)
-    .withMessage('QR Code invalido');
+    .withMessage('Link de ponto e obrigatorio')
+    .custom((value) => {
+      const normalized = String(value || '').trim();
+
+      if (QR_TOKEN_REGEX.test(normalized) || QR_ACCESS_PATH_REGEX.test(normalized)) {
+        return true;
+      }
+
+      try {
+        const url = new URL(normalized);
+        if (QR_ACCESS_PATH_REGEX.test(url.pathname)) {
+          return true;
+        }
+      } catch (_error) {
+        // Mantem a mensagem padrao abaixo.
+      }
+
+      throw new Error('Link de ponto invalido');
+    });
 }
 
 const adminLoginValidator = withValidation([
@@ -148,16 +165,15 @@ const paginationValidator = withValidation([
   query('q').optional().trim().isLength({ max: 120 }).withMessage('q deve ter no maximo 120 caracteres').escape()
 ]);
 
-const qrTokenIdParamValidator = withValidation([
-  param('id').isInt({ min: 1 }).withMessage('ID do token invalido').toInt()
+const qrShortcutIdParamValidator = withValidation([
+  param('id').isInt({ min: 1 }).withMessage('ID do link de ponto invalido').toInt()
 ]);
 
-const validateQrTokenValidator = withValidation([
+const validateQrShortcutValidator = withValidation([
   qrCodeRule()
 ]);
 
 const funcionarioLoginValidator = withValidation([
-  qrCodeRule(),
   body('login')
     .optional()
     .trim()
@@ -172,7 +188,6 @@ const funcionarioLoginValidator = withValidation([
 ]);
 
 const baterPontoValidator = withValidation([
-  qrCodeRule(),
   body('latitude')
     .notEmpty()
     .withMessage('Localizacao obrigatoria para bater ponto')
@@ -195,8 +210,8 @@ module.exports = {
   updateFuncionarioValidator,
   funcionarioStatusValidator,
   paginationValidator,
-  qrTokenIdParamValidator,
-  validateQrTokenValidator,
+  qrShortcutIdParamValidator,
+  validateQrShortcutValidator,
   funcionarioLoginValidator,
   baterPontoValidator
 };
