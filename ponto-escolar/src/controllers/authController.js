@@ -2,7 +2,7 @@
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const pool = require('../config/db');
+const { execute, executeOne } = require('../config/database');
 const { buildAdminAuthCookie, buildClearAdminAuthCookie } = require('../utils/authCookie');
 
 function normalizeCpf(value) {
@@ -25,11 +25,10 @@ async function loginAdmin(req, res, next) {
       return res.status(401).json({ message: unauthorizedMessage });
     }
 
-    const [admins] = await pool.execute(
+    const admin = await executeOne(
       'SELECT id, email, senha_hash FROM admins WHERE email = ? AND ativo = 1 LIMIT 1',
       [email]
     );
-    const admin = admins[0];
     const senhaValida = admin ? await bcrypt.compare(senha, admin.senha_hash) : false;
 
     if (!admin || !senhaValida) {
@@ -38,7 +37,7 @@ async function loginAdmin(req, res, next) {
 
     const token = signToken(admin.id, 'admin');
 
-    await pool.execute('UPDATE admins SET ultimo_login_em = NOW() WHERE id = ?', [admin.id]);
+    await execute('UPDATE admins SET ultimo_login_em = NOW() WHERE id = ?', [admin.id]);
     res.setHeader('Set-Cookie', buildAdminAuthCookie(token));
 
     return res.status(200).json({
@@ -59,19 +58,17 @@ async function loginFuncionario(req, res, next) {
       return res.status(401).json({ message: unauthorizedMessage });
     }
 
-    const [logins] = await pool.execute('SELECT id, cpf, senha FROM login WHERE cpf = ? LIMIT 1', [cpf]);
-    const login = logins[0];
+    const login = await executeOne('SELECT id, cpf, senha FROM login WHERE cpf = ? LIMIT 1', [cpf]);
     const senhaValida = login ? await bcrypt.compare(senha, login.senha) : false;
 
     if (!login || !senhaValida) {
       return res.status(401).json({ message: unauthorizedMessage });
     }
 
-    const [funcionarios] = await pool.execute(
+    const funcionario = await executeOne(
       'SELECT id, cpf, nome, primeiro_acesso FROM funcionarios WHERE cpf = ? AND ativo = 1 LIMIT 1',
       [cpf]
     );
-    const funcionario = funcionarios[0];
 
     if (!funcionario) {
       return res.status(401).json({ message: unauthorizedMessage });

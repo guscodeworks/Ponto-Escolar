@@ -1,13 +1,13 @@
-'use strict';
+"use strict";
 
-require('dotenv').config({ quiet: true });
+require("dotenv").config({ quiet: true });
 
 function throwConfigError(message) {
   throw new Error(`Invalid Gov.br configuration: ${message}`);
 }
 
 function getRequiredValue(name) {
-  const value = String(process.env[name] || '').trim();
+  const value = String(process.env[name] || "").trim();
 
   if (!value) {
     throwConfigError(`"${name}" is required`);
@@ -16,8 +16,8 @@ function getRequiredValue(name) {
   return value;
 }
 
-function getOptionalValue(name, fallbackValue = '') {
-  return String(process.env[name] || fallbackValue || '').trim();
+function getOptionalValue(name, fallbackValue = "") {
+  return String(process.env[name] || fallbackValue || "").trim();
 }
 
 function getRequiredFallbackValue(name, fallbackName) {
@@ -44,7 +44,7 @@ function validateUrl(name, value) {
     throwConfigError(`"${name}" must be a valid URL`);
   }
 
-  if (!['http:', 'https:'].includes(url.protocol)) {
+  if (!["http:", "https:"].includes(url.protocol)) {
     throwConfigError(`"${name}" must use HTTP or HTTPS`);
   }
 
@@ -63,47 +63,49 @@ function getOptionalUrl(name, fallbackValue) {
 
 function getList(name) {
   return getOptionalValue(name)
-    .split(',')
+    .split(",")
     .map((value) => value.trim())
     .filter(Boolean);
 }
 
 function getAdminSubs() {
-  return getList('ADMIN_GOVBR_SUBS');
+  return getList("ADMIN_GOVBR_SUBS");
 }
 
 function getAdminEmails() {
-  return getList('ADMIN_GOVBR_EMAILS').map((email) => email.toLowerCase());
+  return getList("ADMIN_GOVBR_EMAILS").map((email) => email.toLowerCase());
 }
 
 function getFakeBaseUrl() {
-  return getOptionalValue('GOVBR_FAKE_BASE_URL').replace(/\/+$/, '');
+  return getOptionalValue("GOVBR_FAKE_BASE_URL").replace(/\/+$/, "");
 }
 
 function requireAtLeastOneAdminIdentifier(adminSubs, adminEmails) {
   if (adminSubs.length === 0 && adminEmails.length === 0) {
-    throwConfigError('"ADMIN_GOVBR_SUBS" or "ADMIN_GOVBR_EMAILS" must include at least one value');
+    throwConfigError(
+      '"ADMIN_GOVBR_SUBS" or "ADMIN_GOVBR_EMAILS" must include at least one value'
+    );
   }
 }
 
 function getAuthorizeUrl(fakeBaseUrl) {
   return getOptionalUrl(
-    'GOVBR_AUTHORIZE_URL',
-    fakeBaseUrl ? `${fakeBaseUrl}/fake-govbr/authorize` : ''
+    "GOVBR_AUTHORIZE_URL",
+    fakeBaseUrl ? `${fakeBaseUrl}/fake-govbr/authorize` : ""
   );
 }
 
 function getTokenUrl(fakeBaseUrl) {
   return getOptionalUrl(
-    'GOVBR_TOKEN_URL',
-    fakeBaseUrl ? `${fakeBaseUrl}/fake-govbr/token` : ''
+    "GOVBR_TOKEN_URL",
+    fakeBaseUrl ? `${fakeBaseUrl}/fake-govbr/token` : ""
   );
 }
 
 function getUserInfoUrl(fakeBaseUrl) {
   return getOptionalUrl(
-    'GOVBR_USERINFO_URL',
-    fakeBaseUrl ? `${fakeBaseUrl}/fake-govbr/userinfo` : ''
+    "GOVBR_USERINFO_URL",
+    fakeBaseUrl ? `${fakeBaseUrl}/fake-govbr/userinfo` : ""
   );
 }
 
@@ -118,14 +120,23 @@ function getGovbrConfig() {
     authorizeUrl: getAuthorizeUrl(fakeBaseUrl),
     tokenUrl: getTokenUrl(fakeBaseUrl),
     userInfoUrl: getUserInfoUrl(fakeBaseUrl),
-    clientId: getRequiredFallbackValue('GOVBR_FAKE_CLIENT_ID', 'GOVBR_CLIENT_ID'),
-    clientSecret: getRequiredFallbackValue('GOVBR_FAKE_CLIENT_SECRET', 'GOVBR_CLIENT_SECRET'),
-    redirectUri: getOptionalUrl('GOVBR_FAKE_REDIRECT_URI', process.env.GOVBR_REDIRECT_URI),
+    clientId: getRequiredFallbackValue(
+      "GOVBR_FAKE_CLIENT_ID",
+      "GOVBR_CLIENT_ID"
+    ),
+    clientSecret: getRequiredFallbackValue(
+      "GOVBR_FAKE_CLIENT_SECRET",
+      "GOVBR_CLIENT_SECRET"
+    ),
+    redirectUri: getOptionalUrl(
+      "GOVBR_FAKE_REDIRECT_URI",
+      process.env.GOVBR_REDIRECT_URI
+    ),
     adminSubs: Object.freeze(adminSubs),
-    adminEmails: Object.freeze(adminEmails)
+    adminEmails: Object.freeze(adminEmails),
   });
 }
 
 module.exports = {
-  getGovbrConfig
+  getGovbrConfig,
 };
