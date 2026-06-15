@@ -56,7 +56,11 @@ app.use(
 );
 
 function getRequestHost(req) {
-  return String(req.headers["x-forwarded-host"] || req.get("host") || "")
+  const host = env.IS_PRODUCTION
+    ? req.headers["x-forwarded-host"] || req.get("host")
+    : req.get("host");
+
+  return String(host || "")
     .split(",")[0]
     .trim()
     .toLowerCase();

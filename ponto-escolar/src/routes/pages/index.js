@@ -102,7 +102,10 @@ function createPagesRouter({
           qrCode,
           unidadeCodigo: effectiveUnitCode,
           tokenHint: validation.qrCode?.token_hint || qrCode.slice(0, 12),
-          expiresAt: validation.qrCode?.expira_em || null,
+          expiresAt:
+            validation.qrCode?.expires_at_iso ||
+            validation.qrCode?.expira_em ||
+            null,
           validatedAt: new Date().toISOString(),
         };
         await saveSession(req);

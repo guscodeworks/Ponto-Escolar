@@ -8,7 +8,7 @@ const { maskCpf, normalizeCpf } = require("../utils/cpf");
 const { ForbiddenError } = require("../utils/errors");
 
 function getClientIp(req) {
-  return req.headers["x-forwarded-for"]?.split(",")?.[0]?.trim() || req.ip || null;
+  return req.ip || null;
 }
 
 function getClientUserAgent(req) {

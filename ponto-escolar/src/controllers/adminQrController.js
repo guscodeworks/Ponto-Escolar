@@ -9,9 +9,7 @@ const { registerAuditLog } = require("../services/auditLogService");
 const env = require("../config/env");
 
 function getClientIp(req) {
-  return (
-    req.headers["x-forwarded-for"]?.split(",")?.[0]?.trim() || req.ip || null
-  );
+  return req.ip || null;
 }
 
 function getConfiguredBaseUrl() {

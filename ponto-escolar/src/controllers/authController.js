@@ -7,7 +7,7 @@ const { buildClearAdminAuthCookie } = require("../utils/authCookie");
 const { ForbiddenError } = require("../utils/errors");
 
 function getClientIp(req) {
-  return req.headers["x-forwarded-for"]?.split(",")?.[0]?.trim() || req.ip || null;
+  return req.ip || null;
 }
 
 function getGovbrFakeHomeUrl() {
