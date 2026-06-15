@@ -1,18 +1,20 @@
-const crypto = require('crypto');
-const env = require('../config/env');
-const { isValidTokenFormat } = require('../utils/token');
+"use strict";
 
-const QR_CONTEXT = 'BATIDA_PONTO';
-const SAO_PAULO_TIMEZONE = 'America/Sao_Paulo';
+const crypto = require("crypto");
+const env = require("../config/env");
+const { isValidTokenFormat } = require("../utils/token");
+
+const QR_CONTEXT = "BATIDA_PONTO";
+const SAO_PAULO_TIMEZONE = "America/Sao_Paulo";
 const QR_TOKEN_TTL_MS = 10 * 60 * 1000;
 
 function getSaoPauloDateParts(referenceDate = new Date()) {
-  const formatter = new Intl.DateTimeFormat('sv-SE', {
+  const formatter = new Intl.DateTimeFormat("sv-SE", {
     timeZone: SAO_PAULO_TIMEZONE,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour12: false
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour12: false,
   });
 
   const parts = formatter.formatToParts(referenceDate);
@@ -24,18 +26,13 @@ function getSaoPauloDateParts(referenceDate = new Date()) {
   return {
     year: Number(map.year),
     month: Number(map.month),
-    day: Number(map.day)
+    day: Number(map.day),
   };
 }
 
 function getSaoPauloDayKey(referenceDate = new Date()) {
   const { year, month, day } = getSaoPauloDateParts(referenceDate);
-  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-}
-
-function getNextSaoPauloMidnight(referenceDate = new Date()) {
-  const { year, month, day } = getSaoPauloDateParts(referenceDate);
-  return new Date(Date.UTC(year, month - 1, day + 1, 3, 0, 0, 0));
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
 
 function getTokenWindow(referenceDate = new Date()) {
@@ -46,25 +43,28 @@ function getTokenWindow(referenceDate = new Date()) {
   return {
     key: String(windowStartMs),
     startsAt: new Date(windowStartMs),
-    expiresAt: new Date(windowEndMs)
+    expiresAt: new Date(windowEndMs),
   };
 }
 
 function toMysqlDateTime(date) {
-  return date.toISOString().slice(0, 19).replace('T', ' ');
+  return date.toISOString().slice(0, 19).replace("T", " ");
 }
 
 function getUnitCode(unidadeCodigo = env.SCHOOL_UNIT_CODE) {
-  const normalized = String(unidadeCodigo || 'DEFAULT').trim().toUpperCase();
-  return normalized || 'DEFAULT';
+  const normalized = String(unidadeCodigo || "DEFAULT").trim().toUpperCase();
+  return normalized || "DEFAULT";
 }
 
-function getDailyToken({ unidadeCodigo = env.SCHOOL_UNIT_CODE, referenceDate = new Date() } = {}) {
+function getDailyToken({
+  unidadeCodigo = env.SCHOOL_UNIT_CODE,
+  referenceDate = new Date(),
+} = {}) {
   const unitCode = getUnitCode(unidadeCodigo);
   const dayKey = getSaoPauloDayKey(referenceDate);
   const tokenWindow = getTokenWindow(referenceDate);
   const payload = `${dayKey}:${unitCode}:${tokenWindow.key}`;
-  return crypto.createHmac('sha256', env.JWT_SECRET).update(payload).digest('hex');
+  return crypto.createHmac("sha256", env.JWT_SECRET).update(payload).digest("hex");
 }
 
 function isSameToken(candidate, expected) {
@@ -72,11 +72,12 @@ function isSameToken(candidate, expected) {
     return false;
   }
 
-  const left = Buffer.from(candidate, 'hex');
-  const right = Buffer.from(expected, 'hex');
+  const left = Buffer.from(candidate, "hex");
+  const right = Buffer.from(expected, "hex");
   if (left.length !== right.length) {
     return false;
   }
+
   return crypto.timingSafeEqual(left, right);
 }
 
@@ -90,20 +91,28 @@ function mapQrCode(row, includeSecret = false) {
     token_hint: row.token_hint,
     contexto: row.contexto,
     unidade_codigo: row.unidade_codigo,
-    ativo: true,
+    ativo: Boolean(row.ativo),
     valido_de: row.valido_de,
     expira_em: row.expira_em,
     criado_em: row.criado_em,
-    desativado_em: null,
-    ...(includeSecret ? { qr_code: row.qr_code, url: row.url } : {})
+    desativado_em: row.desativado_em,
+    ...(includeSecret ? { qr_code: row.qr_code, url: row.url } : {}),
   };
 }
 
-function buildDailyQrPayload({ unidadeCodigo = env.SCHOOL_UNIT_CODE, baseUrl = '', referenceDate = new Date() } = {}) {
+function buildDailyQrPayload({
+  unidadeCodigo = env.SCHOOL_UNIT_CODE,
+  baseUrl = "",
+  referenceDate = new Date(),
+} = {}) {
   const qrCode = getDailyToken({ unidadeCodigo, referenceDate });
   const dayKey = getSaoPauloDayKey(referenceDate);
   const tokenWindow = getTokenWindow(referenceDate);
-  const id = Number(`${dayKey.replace(/-/g, '')}${String(Math.floor(tokenWindow.startsAt.getTime() / QR_TOKEN_TTL_MS)).slice(-4)}`);
+  const id = Number(
+    `${dayKey.replace(/-/g, "")}${String(
+      Math.floor(tokenWindow.startsAt.getTime() / QR_TOKEN_TTL_MS)
+    ).slice(-4)}`
+  );
   const path = `/ponto/acessar?qr_code=${qrCode}`;
 
   return {
@@ -111,23 +120,32 @@ function buildDailyQrPayload({ unidadeCodigo = env.SCHOOL_UNIT_CODE, baseUrl = '
     token_hint: qrCode.slice(0, 12),
     contexto: QR_CONTEXT,
     unidade_codigo: getUnitCode(unidadeCodigo),
+    ativo: true,
     valido_de: toMysqlDateTime(tokenWindow.startsAt),
     expira_em: toMysqlDateTime(tokenWindow.expiresAt),
     criado_em: toMysqlDateTime(referenceDate),
+    desativado_em: null,
     qr_code: qrCode,
-    url: baseUrl ? `${baseUrl.replace(/\/$/, '')}${path}` : path
+    url: baseUrl ? `${baseUrl.replace(/\/$/, "")}${path}` : path,
   };
 }
 
-async function createQrCode({ unidadeCodigo = env.SCHOOL_UNIT_CODE, baseUrl = '' } = {}) {
-  const payload = buildDailyQrPayload({ unidadeCodigo, baseUrl, referenceDate: new Date() });
+async function createQrCode({
+  unidadeCodigo = env.SCHOOL_UNIT_CODE,
+  baseUrl = "",
+} = {}) {
+  const payload = buildDailyQrPayload({
+    unidadeCodigo,
+    baseUrl,
+    referenceDate: new Date(),
+  });
   return mapQrCode(payload, true);
 }
 
 async function listQrCodes({ page = 1, limit = 20 } = {}) {
   const safePage = Math.max(Number(page || 1), 1);
   const safeLimit = Math.min(Math.max(Number(limit || 20), 1), 100);
-  const payload = buildDailyQrPayload({ referenceDate: new Date() });
+  const payload = buildDailyQrPayload();
   const items = safePage === 1 && safeLimit > 0 ? [mapQrCode(payload)] : [];
 
   return {
@@ -135,27 +153,23 @@ async function listQrCodes({ page = 1, limit = 20 } = {}) {
     pagination: {
       page: safePage,
       limit: safeLimit,
-      total: 1
-    }
+      total: 1,
+    },
   };
 }
 
-async function validateQrCode(qrCode, { unidadeCodigo = env.SCHOOL_UNIT_CODE } = {}) {
-  if (!isValidTokenFormat(qrCode)) {
-    return {
-      valid: false,
-      status: 'malformado',
-      qrCode: null
-    };
-  }
-
-  const payload = buildDailyQrPayload({ unidadeCodigo, referenceDate: new Date() });
-  const isValid = isSameToken(qrCode, payload.qr_code);
+async function validateQrCode(qrCode, {
+  unidadeCodigo = env.SCHOOL_UNIT_CODE,
+  referenceDate = new Date(),
+} = {}) {
+  const normalizedQrCode = String(qrCode || "").trim();
+  const payload = buildDailyQrPayload({ unidadeCodigo, referenceDate });
+  const isValid = isSameToken(normalizedQrCode, payload.qr_code);
 
   return {
     valid: isValid,
-    status: isValid ? 'valido' : 'invalido_ou_expirado',
-    qrCode: isValid ? mapQrCode(payload) : null
+    status: isValid ? "ativo" : "invalido_ou_expirado",
+    qrCode: isValid ? mapQrCode(payload) : null,
   };
 }
 
@@ -165,10 +179,10 @@ async function deactivateQrCode(_id) {
 
 module.exports = {
   QR_CONTEXT,
+  QR_TOKEN_TTL_MS,
   createQrCode,
   listQrCodes,
   validateQrCode,
   deactivateQrCode,
   mapQrCode,
-  getDailyToken
 };
