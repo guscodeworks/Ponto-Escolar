@@ -1,6 +1,8 @@
-# Ponto Escolar
+# ATestaPonto
 
-Ponto Escolar é um TCC técnico em desenvolvimento para controle de ponto em ambiente escolar. O repositório reúne o sistema principal, responsável por funcionários, registros e acesso administrativo, e um simulador local do Gov.br usado para demonstrar o fluxo de autenticação.
+ATestaPonto é o sistema de controle de ponto escolar apresentado neste TCC técnico. O projeto está em desenvolvimento e reúne o sistema principal, responsável por funcionários, registros e acesso administrativo, e um simulador local do Gov.br usado para demonstrar o fluxo de autenticação.
+
+No repositório, a pasta `ponto-escolar` contém o sistema principal do ATestaPonto. A pasta `gov.br-fake` contém o simulador local do Gov.br/Login Único. Esses nomes técnicos permanecem nos comandos, caminhos, pacotes e rotas.
 
 ## Objetivo
 
@@ -15,14 +17,14 @@ A área administrativa cadastra funcionários, consulta presença e gera relató
 
 | Projeto | Responsabilidade | Persistência |
 | --- | --- | --- |
-| [`ponto-escolar`](./ponto-escolar) | Sistema principal, páginas web, APIs, autorização administrativa, funcionários, ponto e relatórios | MySQL para os dados da aplicação; sessão administrativa configurada com `express-session` |
+| [`ponto-escolar`](./ponto-escolar) | Sistema principal do ATestaPonto, com páginas web, APIs, autorização administrativa, funcionários, ponto e relatórios | MySQL para os dados da aplicação; sessão administrativa configurada com `express-session` |
 | [`gov.br-fake`](./gov.br-fake) | Simulador local do fluxo de autorização, emissão de código, troca por token e consulta de `/userinfo` | Memória do processo |
 
 Os projetos possuem `package.json`, dependências e configuração próprios. Não existe um `package.json` na raiz.
 
 ### Limite de responsabilidade
 
-> **Gov.br autentica. Ponto Escolar autoriza.**
+> **Gov.br autentica. ATestaPonto autoriza.**
 
 O Gov.br, ou o simulador local, confirma a identidade apresentada no fluxo OAuth/OIDC. O `ponto-escolar` compara o identificador recebido com sua lista interna de administradores antes de criar a sessão administrativa.
 
@@ -480,7 +482,7 @@ O back-end usa consultas parametrizadas nas operações MySQL, bcrypt para senha
 
 ## Status atual e pontos a evoluir
 
-O projeto está em desenvolvimento como TCC técnico. O código implementa o fluxo local entre o sistema principal e o simulador, as páginas administrativas, o cadastro de funcionários, o login de funcionário, a validação geográfica e o registro de quatro batidas.
+O ATestaPonto está em desenvolvimento como TCC técnico. O código implementa o fluxo local entre o sistema principal e o simulador, as páginas administrativas, o cadastro de funcionários, o login de funcionário, a validação geográfica e o registro de quatro batidas.
 
 O status atual mantém estas pendências técnicas:
 
@@ -519,6 +521,6 @@ O `gov.br-fake` existe para demonstração técnica local. Ele:
 - não substitui o Gov.br ou o Login Único;
 - não deve receber dados pessoais reais;
 - não deve ser usado em produção;
-- não decide quem administra o Ponto Escolar.
+- não decide quem administra o ATestaPonto.
 
 A autorização administrativa pertence ao `ponto-escolar`, mesmo quando o simulador retorna uma identidade autenticada.
