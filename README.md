@@ -1,17 +1,55 @@
 # ATestaPonto
 
-ATestaPonto é o sistema de controle de ponto escolar apresentado neste TCC técnico. O projeto está em desenvolvimento e reúne o sistema principal, responsável por funcionários, registros e acesso administrativo, e um simulador local do Gov.br usado para demonstrar o fluxo de autenticação.
+ATestaPonto é o sistema de controle de ponto escolar deste Trabalho de Conclusão de Curso técnico. O repositório reúne o sistema principal, a autenticação administrativa e o simulador local usado na demonstração.
 
-No repositório, a pasta `ponto-escolar` contém o sistema principal do ATestaPonto. A pasta `gov.br-fake` contém o simulador local do Gov.br/Login Único. Esses nomes técnicos permanecem nos comandos, caminhos, pacotes e rotas.
+Neste TCC, o foco é mostrar um fluxo de controle de jornada para ambiente escolar com autorização interna no back-end e um simulador local para a parte de identidade.
+
+## Status do projeto
+
+| Item | Estado atual |
+| --- | --- |
+| Fase | TCC técnico em desenvolvimento |
+| Sistema principal | Implementado na pasta `ponto-escolar` |
+| Autenticação administrativa | Fluxo OAuth/OIDC implementado para uso com o simulador local |
+| Integração oficial com Gov.br | A confirmar, depende de cadastro, endpoints e credenciais oficiais |
+| Banco de dados | Acesso MySQL implementado; schema SQL ainda não versionado |
+| Testes automatizados | Ainda não disponíveis |
+| Uso em produção | Não configurado nem declarado como pronto |
+
+## Sumário
+
+- [Contexto do TCC](#contexto-do-tcc)
+- [Objetivo](#objetivo)
+- [Projetos do repositório](#projetos-do-repositório)
+- [Regra central de autenticação e autorização](#regra-central-de-autenticação-e-autorização)
+- [Funcionalidades implementadas](#funcionalidades-implementadas)
+- [Tecnologias](#tecnologias)
+- [Estrutura de pastas](#estrutura-de-pastas)
+- [Pré-requisitos](#pré-requisitos)
+- [Instalação](#instalação)
+- [Configuração de ambiente](#configuração-de-ambiente)
+- [Banco de dados](#banco-de-dados)
+- [Como executar](#como-executar)
+- [Fluxo administrativo Gov.br/OIDC](#fluxo-administrativo-govbroidc)
+- [Fluxo de registro de ponto](#fluxo-de-registro-de-ponto)
+- [QR Code](#qr-code)
+- [Rotas principais](#rotas-principais)
+- [Segurança](#segurança)
+- [Status atual e pontos a evoluir](#status-atual-e-pontos-a-evoluir)
+- [Próximos passos](#próximos-passos)
+- [Aviso sobre o gov.br-fake](#aviso-sobre-o-govbr-fake)
+
+## Contexto do TCC
+
+O TCC usa o ATestaPonto para demonstrar controle de jornada em ambiente escolar. O desenho do projeto separa três pontos que eu precisei tratar de forma distinta no código: identidade, autorização administrativa e registro de ponto.
+
+No repositório, `ponto-escolar` guarda o sistema principal e `gov.br-fake` guarda o simulador local do Gov.br/Login Único. Os nomes das pastas continuam nos comandos, caminhos, pacotes e rotas.
 
 ## Objetivo
 
-O sistema atende administradores e funcionários:
+O sistema atende dois fluxos. No administrativo, a identidade passa por Gov.br/OIDC e o ATestaPonto decide se aquele usuário entra no painel. No fluxo do funcionário, o login usa CPF ou e-mail e senha, emite um JWT e libera o registro de até quatro batidas por dia dentro da área geográfica configurada.
 
-- o administrador autentica sua identidade por um provedor Gov.br/OIDC e acessa as funções administrativas após uma autorização interna;
-- o funcionário entra com CPF e senha, recebe uma sessão JWT e registra até quatro batidas por dia dentro da área geográfica configurada.
-
-A área administrativa cadastra funcionários, consulta presença e gera relatórios diários. Um QR Code direciona o funcionário para a tela de ponto.
+A área administrativa cadastra funcionários, consulta presença e gera relatórios diários. O QR Code leva o funcionário para a tela de ponto.
 
 ## Projetos do repositório
 
@@ -22,50 +60,40 @@ A área administrativa cadastra funcionários, consulta presença e gera relató
 
 Os projetos possuem `package.json`, dependências e configuração próprios. Não existe um `package.json` na raiz.
 
-### Limite de responsabilidade
+## Regra central de autenticação e autorização
 
 > **Gov.br autentica. ATestaPonto autoriza.**
 
-O Gov.br, ou o simulador local, confirma a identidade apresentada no fluxo OAuth/OIDC. O `ponto-escolar` compara o identificador recebido com sua lista interna de administradores antes de criar a sessão administrativa.
+O Gov.br, ou o simulador local, confirma a identidade no fluxo OAuth/OIDC. Depois disso, o `ponto-escolar` compara o identificador recebido com a lista interna de administradores antes de criar a sessão administrativa.
 
-Um token válido confirma a autenticação no provedor. Ele não concede permissão administrativa por conta própria. O back-end do `ponto-escolar` executa a autorização e protege páginas e APIs com `req.session.admin`.
+Token válido confirma autenticação no provedor. Ele não dá permissão administrativa sozinho. O back-end do `ponto-escolar` faz essa verificação e protege páginas e APIs com `req.session.admin`.
 
-O `gov.br-fake` serve para desenvolvimento, estudo e apresentação local. Ele não representa o serviço oficial do Gov.br e não deve ser publicado ou usado como provedor de produção.
+O `gov.br-fake` existe para desenvolvimento, estudo e apresentação local. Ele não representa o serviço oficial do Gov.br.
 
 ## Funcionalidades implementadas
 
 ### Sistema principal
 
-- autenticação administrativa por fluxo OAuth/OIDC;
-- validação de `state` e PKCE com `S256`;
+- autenticação administrativa por fluxo OAuth/OIDC com `state` e PKCE `S256`;
 - autorização administrativa por `sub` ou e-mail configurado no back-end;
-- sessão administrativa regenerada após o login;
-- páginas e APIs administrativas protegidas;
+- sessão administrativa regenerada após o login e proteção de páginas e APIs;
 - cadastro, listagem, edição, ativação e desativação de funcionários;
-- login de funcionário com CPF ou e-mail e senha;
-- emissão e validação de JWT com papel `funcionario`;
-- nova consulta ao banco para confirmar que o funcionário continua ativo;
-- registro de entrada, saída para almoço, retorno do almoço e saída;
-- validação de latitude, longitude e raio permitido;
-- transação no banco durante o registro de ponto;
+- login de funcionário com CPF ou e-mail e senha, emissão de JWT e nova consulta ao banco para confirmar o estado ativo;
+- registro de entrada, saída para almoço, retorno do almoço e saída, com validação de latitude, longitude, raio permitido e transação no banco;
 - resumo de presença e relatório diário;
-- validação de dados com `express-validator`;
-- tratamento centralizado de erros e sanitização de logs;
-- limitação de requisições, CORS e cabeçalhos de segurança.
+- validação de dados com `express-validator`, tratamento centralizado de erros, sanitização de logs, rate limiting, CORS e cabeçalhos de segurança.
 
 ### Simulador Gov.br
 
 - tela local de autenticação demonstrativa;
 - endpoint de autorização com `response_type=code`;
-- validação de `client_id` e `redirect_uri`;
+- validação de `client_id`, `redirect_uri` e PKCE `S256`;
 - emissão e consumo único de authorization code;
-- validação de PKCE `S256`;
-- troca do código por access token;
-- consulta de identidade pelo endpoint `/userinfo`;
+- troca do código por access token e consulta de identidade pelo endpoint `/userinfo`;
 - sessão local em cookie `HttpOnly`;
 - expiração e limpeza de sessões, códigos e tokens armazenados em memória.
 
-## Tecnologias confirmadas
+## Tecnologias
 
 ### Base do projeto
 
@@ -98,9 +126,11 @@ O `gov.br-fake` serve para desenvolvimento, estudo e apresentação local. Ele n
 ## Estrutura de pastas
 
 ```text
-Ponto-Escolar/
+.
 ├── AGENTS.md
+├── README.md
 ├── ponto-escolar/
+│   ├── .env.example
 │   ├── server.js
 │   ├── package.json
 │   ├── package-lock.json
@@ -120,6 +150,7 @@ Ponto-Escolar/
 │       ├── services/
 │       └── utils/
 └── gov.br-fake/
+    ├── .env.example
     ├── server.js
     ├── package.json
     ├── package-lock.json
@@ -148,7 +179,7 @@ O `ponto-escolar` segue uma estrutura MVC com services:
 
 ## Pré-requisitos
 
-- Node.js 18 ou superior, pois o sistema principal usa `fetch` global nas chamadas ao provedor;
+- Node.js 18 ou superior, conforme o campo `engines` dos dois projetos;
 - npm;
 - MySQL acessível pelo `ponto-escolar`;
 - navegador com acesso à localização para registrar ponto pela interface.
@@ -167,93 +198,53 @@ npm ci
 
 Os dois projetos possuem `package-lock.json`, por isso os passos acima usam `npm ci`.
 
-## Configuração do ambiente
+## Configuração de ambiente
 
-Cada projeto carrega seu próprio arquivo `.env`. Crie os arquivos dentro de `ponto-escolar/` e `gov.br-fake/`.
+Cada projeto carrega seu próprio arquivo `.env`. O repositório inclui exemplos documentados:
 
-Não use os valores de exemplo como secrets reais. Mantenha `.env` fora do Git.
+- [`ponto-escolar/.env.example`](./ponto-escolar/.env.example);
+- [`gov.br-fake/.env.example`](./gov.br-fake/.env.example).
 
-### `ponto-escolar/.env`
+Copie os arquivos antes da primeira execução:
 
-```dotenv
-NODE_ENV=development
-PORT=3000
-
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=<usuario_mysql>
-DB_PASSWORD=<senha_mysql>
-DB_NAME=<nome_do_banco>
-DB_CONNECTION_LIMIT=10
-
-JWT_SECRET=<segredo_jwt_com_32_ou_mais_caracteres>
-JWT_EXPIRES_IN=8h
-FUNCIONARIO_JWT_EXPIRES_IN=20m
-SESSION_SECRET=<outro_segredo_com_32_ou_mais_caracteres>
-
-SCHOOL_LATITUDE=<latitude_da_escola>
-SCHOOL_LONGITUDE=<longitude_da_escola>
-SCHOOL_UNIT_CODE=<codigo_da_unidade>
-ALLOWED_RADIUS_METERS=<raio_permitido_em_metros>
-
-CORS_ORIGIN=http://localhost:3000
-POINT_RATE_LIMIT_WINDOW_MS=300000
-POINT_RATE_LIMIT_MAX=500
-
-GOVBR_FAKE_BASE_URL=http://localhost:4000
-GOVBR_FAKE_CLIENT_ID=<identificador_do_cliente_local>
-GOVBR_FAKE_CLIENT_SECRET=<segredo_do_cliente_local>
-GOVBR_FAKE_REDIRECT_URI=http://localhost:3000/auth/govbr/callback
-
-ADMIN_GOVBR_SUBS=<identificador_sub_autorizado>
-ADMIN_GOVBR_EMAILS=<email_autorizado_opcional>
-
-BCRYPT_SALT_ROUNDS=12
+```bash
+cp ponto-escolar/.env.example ponto-escolar/.env
+cp gov.br-fake/.env.example gov.br-fake/.env
 ```
 
-Regras aplicadas pelo carregamento da configuração:
+Substitua todos os valores de exemplo antes de usar o sistema fora de uma demonstração local. Não envie os arquivos `.env` para o Git.
 
-- `PORT`, conexão MySQL, coordenadas da escola, raio, CORS e tempos de JWT precisam ter formato válido;
-- `JWT_SECRET` e `SESSION_SECRET` precisam ter ao menos 32 caracteres, combinar tipos diferentes de caracteres e usar valores distintos;
-- `ADMIN_GOVBR_SUBS` ou `ADMIN_GOVBR_EMAILS` precisa conter ao menos um identificador;
-- listas de `sub`, e-mails e origens CORS usam vírgulas como separador;
-- `DB_PASSWORD` pode usar o alias legado `DB_PASS`;
-- `GOVBR_FAKE_REDIRECT_URI` pode usar o alias `GOVBR_REDIRECT_URI`.
+### Sistema principal
 
-Ao conectar o sistema a outro provedor, configure os endpoints de forma explícita:
+O arquivo `ponto-escolar/.env` reúne:
 
-```dotenv
-GOVBR_AUTHORIZE_URL=<url_de_autorizacao>
-GOVBR_TOKEN_URL=<url_de_token>
-GOVBR_USERINFO_URL=<url_de_userinfo>
-GOVBR_CLIENT_ID=<identificador_do_cliente>
-GOVBR_CLIENT_SECRET=<segredo_do_cliente>
-GOVBR_REDIRECT_URI=<url_de_callback>
-```
+- porta e ambiente da aplicação;
+- conexão e limite do pool MySQL;
+- secrets e duração de JWT e sessão;
+- coordenadas da escola e raio permitido;
+- origens CORS e limites de requisição;
+- endpoints e credenciais do provedor OAuth/OIDC;
+- allowlist administrativa por `sub` ou e-mail.
 
-O código usa os endpoints derivados de `GOVBR_FAKE_BASE_URL` durante o desenvolvimento local. A integração com o Gov.br oficial depende de endpoints e credenciais fornecidos para a aplicação.
+O carregamento da configuração exige:
 
-### `gov.br-fake/.env`
+- `JWT_SECRET` e `SESSION_SECRET` diferentes, com ao menos 32 caracteres;
+- conexão MySQL, porta, coordenadas, raio e CORS em formatos válidos;
+- ao menos um valor em `ADMIN_GOVBR_SUBS` ou `ADMIN_GOVBR_EMAILS`;
+- `GOVBR_FAKE_CLIENT_ID`, `GOVBR_FAKE_CLIENT_SECRET` e callback para o fluxo local.
 
-```dotenv
-NODE_ENV=development
-HOST=localhost
-GOVBR_FAKE_PORT=4000
+O código também aceita aliases legados documentados no `.env.example`. Para uma integração oficial, os valores de `GOVBR_AUTHORIZE_URL`, `GOVBR_TOKEN_URL`, `GOVBR_USERINFO_URL`, client ID, client secret e callback dependem do cadastro da aplicação no Gov.br.
 
-GOVBR_FAKE_CLIENT_ID=<mesmo_identificador_configurado_no_ponto_escolar>
-GOVBR_FAKE_CLIENT_SECRET=<mesmo_segredo_configurado_no_ponto_escolar>
+### Simulador local
 
-PONTO_ESCOLAR_REDIRECT_URI=http://localhost:3000/auth/govbr/callback
-PONTO_ESCOLAR_START_URL=http://localhost:3000/auth/govbr/login
+O arquivo `gov.br-fake/.env` define:
 
-GOVBR_FAKE_ADMIN_SUB=<identificador_simulado>
-GOVBR_FAKE_ADMIN_NAME=<nome_simulado>
-GOVBR_FAKE_ADMIN_EMAIL=<email_simulado>
-```
+- host e porta do simulador;
+- client ID e client secret usados na integração local;
+- callback e URL inicial do `ponto-escolar`;
+- identidade fictícia retornada por `/userinfo`.
 
-O simulador possui valores padrão para desenvolvimento. A configuração explícita evita divergências entre `client_id`, client secret e callback dos dois projetos.
-
-Use somente dados fictícios no `gov.br-fake`.
+O client ID, o client secret, o callback, o `sub` e o e-mail administrativo precisam estar alinhados com a configuração do sistema principal. Use somente dados fictícios no simulador.
 
 ## Banco de dados
 
@@ -340,9 +331,9 @@ No `gov.br-fake`:
 npm run check
 ```
 
-A seção de pontos a evoluir registra o estado atual do comando `check`.
+Esse comando valida a sintaxe do arquivo `gov.br-fake/server.js`.
 
-## Fluxo de autenticação administrativa
+## Fluxo administrativo Gov.br/OIDC
 
 ```text
 Navegador
@@ -464,38 +455,31 @@ As rotas de login e registro de ponto também aparecem sob `/api/pontos`.
 | `POST` | `/fake-govbr/token` | Troca o código por access token |
 | `GET` | `/fake-govbr/userinfo` | Retorna os dados do usuário do token |
 
-## Regras de segurança
+## Segurança
 
-- Mantenha senhas, client secrets, chaves JWT e secrets de sessão em `.env`.
-- Use valores diferentes para `JWT_SECRET` e `SESSION_SECRET`.
-- Não envie access token pela URL.
-- Inicie o login administrativo em `/auth/govbr/login`; não chame o callback de forma direta.
-- Preserve a validação de `state` e PKCE.
-- Autorize administradores no `ponto-escolar`, com dados controlados pelo back-end.
-- Não confie em cargo, papel ou permissão enviados pelo front-end.
-- Não trate o QR Code como prova de identidade ou permissão.
-- Use dados fictícios no simulador.
-- Não exponha o `gov.br-fake` como serviço oficial.
-- Restrinja `CORS_ORIGIN` aos endereços usados pela aplicação.
+Guarde senhas, client secrets, chaves JWT e secrets de sessão em `.env`. Use valores diferentes para `JWT_SECRET` e `SESSION_SECRET`. Não envie access token pela URL.
+
+O login administrativo começa em `/auth/govbr/login`. Preserve a validação de `state` e PKCE, autorize administradores no `ponto-escolar` e não confie em cargo, papel ou permissão vindos do front-end.
+
+O QR Code não prova identidade nem permissão. Use dados fictícios no simulador, não exponha o `gov.br-fake` como serviço oficial e restrinja `CORS_ORIGIN` aos endereços usados pela aplicação.
 
 O back-end usa consultas parametrizadas nas operações MySQL, bcrypt para senhas, cookies `HttpOnly`, validação de entrada, limite de corpo, rate limiting e sanitização de dados nos logs.
 
 ## Status atual e pontos a evoluir
 
-O ATestaPonto está em desenvolvimento como TCC técnico. O código implementa o fluxo local entre o sistema principal e o simulador, as páginas administrativas, o cadastro de funcionários, o login de funcionário, a validação geográfica e o registro de quatro batidas.
+O código já cobre o fluxo local entre o sistema principal e o simulador, as páginas administrativas, o cadastro de funcionários, o login de funcionário, a validação geográfica e o registro de quatro batidas.
 
-O status atual mantém estas pendências técnicas:
+O repositório já inclui arquivos `.env.example` para os dois projetos, requisito de Node.js 18 ou superior nos dois `package.json`, comando `npm run check` funcional no `gov.br-fake` e scripts para iniciar os serviços e executar operações de banco.
 
-- **Schema SQL versionado:** o script `npm run db:init` procura `database/schema/ponto.sql`, `ponto (2).sql` ou `ponto.sql`. O repositório não inclui esses arquivos no estado atual. Uma instalação nova precisa de um schema compatível com as tabelas consultadas pelo código.
+O que ainda fica como ponto a evoluir:
+
+- **Schema SQL versionado:** o script `npm run db:init` procura `database/schema/ponto.sql`, `ponto (2).sql` ou `ponto.sql`, mas o repositório não traz esses arquivos no estado atual. Uma instalação nova precisa de um schema compatível com as tabelas consultadas pelo código.
 - **Testes automatizados:** os projetos não possuem suíte de testes nem comando `npm test`.
-- **Arquivos de exemplo de ambiente:** os `.gitignore` permitem `.env.example`, mas o repositório ainda não fornece esse arquivo em nenhuma das pastas.
-- **Validação do simulador:** `npm run check` aponta para `src/server.js`, enquanto o arquivo executável está em `gov.br-fake/server.js`. O script precisa ser ajustado para validar o arquivo correto.
 - **Persistência de sessão administrativa:** o `ponto-escolar` usa o store padrão em memória do `express-session`. Um ambiente com reinício de processo ou mais de uma instância precisa de um store persistente.
-- **Persistência do simulador:** sessões, authorization codes e access tokens ficam em memória e desaparecem quando o `gov.br-fake` reinicia. Esse comportamento atende ao uso local demonstrativo.
+- **Persistência do simulador:** sessões, authorization codes e access tokens ficam em memória e desaparecem quando o `gov.br-fake` reinicia. Isso atende ao uso local demonstrativo.
 - **Integração oficial:** endpoints, credenciais, cadastro do cliente e regras operacionais do Gov.br real dependem de definição externa ao repositório.
 - **Logout por provedor:** o logout administrativo atual redireciona para a rota do `gov.br-fake`. A integração real precisa de configuração própria para encerramento de sessão.
 - **QR Code:** o fluxo atual fornece um atalho fixo para a tela de ponto. A rota de desativação não altera esse atalho.
-- **Versão do Node.js:** o código exige recursos presentes no Node.js 18+, mas os `package.json` ainda não declaram o campo `engines`.
 
 ### Informações a confirmar
 
@@ -506,21 +490,14 @@ O status atual mantém estas pendências técnicas:
 
 ## Próximos passos
 
-1. Versionar um schema SQL revisado e adicionar `.env.example` sem credenciais.
+1. Versionar um schema SQL revisado e compatível com as consultas atuais.
 2. Criar testes para autenticação, autorização, funcionários e registro de ponto.
-3. Corrigir o comando `check` do simulador e declarar a versão suportada do Node.js.
-4. Configurar persistência de sessão antes de executar o sistema em mais de uma instância.
-5. Adaptar endpoints e logout quando as credenciais oficiais do Gov.br estiverem disponíveis.
-6. Revisar os arquivos de autenticação legada antes de removê-los ou incorporá-los ao fluxo atual.
+3. Configurar persistência de sessão antes de executar o sistema em mais de uma instância.
+4. Adaptar endpoints e logout quando as credenciais oficiais do Gov.br estiverem disponíveis.
+5. Revisar os arquivos de autenticação legada antes de removê-los ou incorporá-los ao fluxo atual.
 
 ## Aviso sobre o `gov.br-fake`
 
-O `gov.br-fake` existe para demonstração técnica local. Ele:
-
-- não possui vínculo com o Governo Federal;
-- não substitui o Gov.br ou o Login Único;
-- não deve receber dados pessoais reais;
-- não deve ser usado em produção;
-- não decide quem administra o ATestaPonto.
+O `gov.br-fake` existe para demonstração técnica local. Ele não tem vínculo com o Governo Federal, não substitui o Gov.br ou o Login Único, não deve receber dados pessoais reais e não deve ser usado em produção.
 
 A autorização administrativa pertence ao `ponto-escolar`, mesmo quando o simulador retorna uma identidade autenticada.
