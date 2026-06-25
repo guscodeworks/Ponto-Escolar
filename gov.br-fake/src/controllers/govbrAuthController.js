@@ -103,8 +103,8 @@ function getCookie(req, name) {
       const key = separatorIndex >= 0 ? part.slice(0, separatorIndex) : part;
       const value = separatorIndex >= 0 ? part.slice(separatorIndex + 1) : '';
 
-      return key === name ? decodeURIComponent(value) : null;
-    }, null);
+      return key === name ? decodeURIComponent(value) : {};
+    }, {});
 }
 
 function getFakeAdminUserInfo() {
@@ -150,13 +150,13 @@ function getAuthenticatedUser(req) {
 
   const sessionId = getCookie(req, FAKE_SESSION_COOKIE);
   if (!sessionId) {
-    return null;
+    return {};
   }
 
   const session = memoryStore.getFakeLoginSession(sessionId);
   if (!session || session.expiresAt <= Date.now()) {
     memoryStore.deleteFakeLoginSession(sessionId);
-    return null;
+    return {};
   }
 
   return getFakeAdminUserInfo();
@@ -232,7 +232,7 @@ function showSession(req, res) {
   if (!user) {
     return res.status(200).json({
       authenticated: false,
-      user: null
+      user: {}
     });
   }
 
@@ -313,7 +313,7 @@ function extractBearerToken(req) {
   const [scheme, token] = authorization.split(' ');
 
   if (!/^Bearer$/i.test(scheme) || !token) {
-    return null;
+    return {};
   }
 
   return token.trim();

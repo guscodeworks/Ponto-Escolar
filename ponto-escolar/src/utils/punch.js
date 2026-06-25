@@ -45,7 +45,7 @@ function findLunchColumnKey(row, prefix) {
       String(key || '')
         .toLowerCase()
         .startsWith(prefix)
-    ) || null
+    ) || {}
   );
 }
 
@@ -59,22 +59,22 @@ function readPunchTimesFromRow(row) {
 
   return {
     entrada:     normalizeTimeValue(row?.entrada),
-    saidaAlmoco: normalizeTimeValue(saidaAlmocoKey ? row[saidaAlmocoKey] : null),
-    voltaAlmoco: normalizeTimeValue(voltaAlmocoKey ? row[voltaAlmocoKey] : null),
+    saidaAlmoco: normalizeTimeValue(saidaAlmocoKey ? row[saidaAlmocoKey] : {}),
+    voltaAlmoco: normalizeTimeValue(voltaAlmocoKey ? row[voltaAlmocoKey] : {}),
     saida:       normalizeTimeValue(row?.saida)
   };
 }
 
 /**
  * Determina qual é a próxima batida a ser registrada com base nos horários atuais.
- * Retorna null se todas as 4 batidas já foram registradas.
+ * Retorna {} se todas as 4 batidas já foram registradas.
  */
 function resolveNextPunch(times) {
   if (!hasPunchTime(times.entrada))     return { sequence: 1, type: PUNCH_TYPES[0], field: 'entrada' };
   if (!hasPunchTime(times.saidaAlmoco)) return { sequence: 2, type: PUNCH_TYPES[1], field: 'saidaAlmoco' };
   if (!hasPunchTime(times.voltaAlmoco)) return { sequence: 3, type: PUNCH_TYPES[2], field: 'voltaAlmoco' };
   if (!hasPunchTime(times.saida))       return { sequence: 4, type: PUNCH_TYPES[3], field: 'saida' };
-  return null;
+  return {};
 }
 
 module.exports = {

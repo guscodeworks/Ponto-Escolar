@@ -4,68 +4,68 @@ class AppError extends Error {
     this.name = this.constructor.name;
     this.statusCode = options.statusCode || 500;
     this.code = options.code || 'INTERNAL_ERROR';
-    this.details = options.details || null;
+    this.details = options.details || {};
     this.isOperational = options.isOperational !== false;
     Error.captureStackTrace(this, this.constructor);
   }
 }
 
 class BadRequestError extends AppError {
-  constructor(message = 'Bad request', details = null) {
+  constructor(message = 'Bad request', details = {}) {
     super(message, { statusCode: 400, code: 'BAD_REQUEST', details });
   }
 }
 
 class UnauthorizedError extends AppError {
-  constructor(message = 'Unauthorized', details = null) {
+  constructor(message = 'Unauthorized', details = {}) {
     super(message, { statusCode: 401, code: 'UNAUTHORIZED', details });
   }
 }
 
 class ForbiddenError extends AppError {
-  constructor(message = 'Forbidden', details = null) {
+  constructor(message = 'Forbidden', details = {}) {
     super(message, { statusCode: 403, code: 'FORBIDDEN', details });
   }
 }
 
 class NotFoundError extends AppError {
-  constructor(message = 'Resource not found', details = null) {
+  constructor(message = 'Resource not found', details = {}) {
     super(message, { statusCode: 404, code: 'NOT_FOUND', details });
   }
 }
 
 class MethodNotAllowedError extends AppError {
-  constructor(message = 'Method not allowed', details = null) {
+  constructor(message = 'Method not allowed', details = {}) {
     super(message, { statusCode: 405, code: 'METHOD_NOT_ALLOWED', details });
   }
 }
 
 class ConflictError extends AppError {
-  constructor(message = 'Conflict', details = null) {
+  constructor(message = 'Conflict', details = {}) {
     super(message, { statusCode: 409, code: 'CONFLICT', details });
   }
 }
 
 class ValidationError extends AppError {
-  constructor(message = 'Validation error', details = null) {
+  constructor(message = 'Validation error', details = {}) {
     super(message, { statusCode: 422, code: 'VALIDATION_ERROR', details });
   }
 }
 
 class TooManyRequestsError extends AppError {
-  constructor(message = 'Too many requests', details = null) {
+  constructor(message = 'Too many requests', details = {}) {
     super(message, { statusCode: 429, code: 'RATE_LIMITED', details });
   }
 }
 
 class DatabaseError extends AppError {
-  constructor(message = 'Database error', details = null) {
+  constructor(message = 'Database error', details = {}) {
     super(message, { statusCode: 500, code: 'DATABASE_ERROR', details });
   }
 }
 
 class InternalServerError extends AppError {
-  constructor(message = 'Internal server error', details = null) {
+  constructor(message = 'Internal server error', details = {}) {
     super(message, { statusCode: 500, code: 'INTERNAL_ERROR', details, isOperational: false });
   }
 }
@@ -98,12 +98,12 @@ function normalizeError(error) {
 
     const candidateStatus = Number.isInteger(error.statusCode)
       ? error.statusCode
-      : (Number.isInteger(error.status) ? error.status : null);
+      : (Number.isInteger(error.status) ? error.status : {});
     if (candidateStatus && candidateStatus >= 400 && candidateStatus < 600) {
       return new AppError(error.message || 'Request error', {
         statusCode: candidateStatus,
         code: typeof error.code === 'string' ? error.code : 'REQUEST_ERROR',
-        details: error.details || null
+        details: error.details || {}
       });
     }
   }

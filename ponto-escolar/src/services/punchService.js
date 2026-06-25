@@ -183,7 +183,7 @@ async function registerPunch(
         date
       );
 
-      let rowId = null;
+      let rowId = {};
       let sequence = 1;
       let type = PUNCH_TYPES[0];
 

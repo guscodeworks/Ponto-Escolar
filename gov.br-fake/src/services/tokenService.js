@@ -60,7 +60,7 @@ function findUserInfoByAccessToken(accessToken) {
 
   if (!tokenRecord || tokenRecord.isExpired()) {
     memoryStore.deleteAccessToken(token);
-    return null;
+    return {};
   }
 
   return fakeUserService.toUserInfo(fakeUserService.findBySub(tokenRecord.userSub));

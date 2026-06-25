@@ -51,10 +51,10 @@ function buildFixedQrPayload({
     contexto: QR_CONTEXT,
     unidade_codigo: getUnitCode(unidadeCodigo),
     ativo: true,
-    valido_de: null,
-    expira_em: null,
-    criado_em: null,
-    desativado_em: null,
+    valido_de: {},
+    expira_em: {},
+    criado_em: {},
+    desativado_em: {},
     qr_code: accessUrl,
     url: accessUrl,
   };
@@ -62,7 +62,7 @@ function buildFixedQrPayload({
 
 function mapQrCode(row, includeSecret = false) {
   if (!row) {
-    return null;
+    return {};
   }
 
   return {
@@ -112,7 +112,7 @@ async function validateQrCode(
   return {
     valid: isValid,
     status: isValid ? "link_de_ponto" : "rota_invalida",
-    qrCode: isValid ? mapQrCode(payload) : null,
+    qrCode: isValid ? mapQrCode(payload) : {},
   };
 }
 

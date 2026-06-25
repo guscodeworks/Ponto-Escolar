@@ -4,12 +4,12 @@ const punchService = require("../services/punchService");
 
 function getClientIp(req) {
   return (
-    req.headers["x-forwarded-for"]?.split(",")?.[0]?.trim() || req.ip || null
+    req.headers["x-forwarded-for"]?.split(",")?.[0]?.trim() || req.ip || {}
   );
 }
 
 function getClientUserAgent(req) {
-  return String(req.headers["user-agent"] || "").slice(0, 255) || null;
+  return String(req.headers["user-agent"] || "").slice(0, 255) || {};
 }
 
 async function loginFuncionario(req, res, next) {

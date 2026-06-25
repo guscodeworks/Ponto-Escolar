@@ -4,7 +4,7 @@ const employeeService = require("../services/employeeService");
 
 function getClientIp(req) {
   return (
-    req.headers["x-forwarded-for"]?.split(",")?.[0]?.trim() || req.ip || null
+    req.headers["x-forwarded-for"]?.split(",")?.[0]?.trim() || req.ip || {}
   );
 }
 

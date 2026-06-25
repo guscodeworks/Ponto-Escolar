@@ -158,8 +158,8 @@ async function concluirLoginGovbr(req, res, next) {
     const adminSession = {
       authProvider: "govbr",
       sub: String(userInfo.sub).trim(),
-      name: String(userInfo.name || "").trim() || null,
-      email: String(userInfo.email || "").trim() || null,
+      name: String(userInfo.name || "").trim() || {},
+      email: String(userInfo.email || "").trim() || {},
       loginAt: new Date().toISOString(),
     };
 

@@ -50,7 +50,7 @@ function saveAuthCode(code, authCode) {
 }
 
 function getAuthCode(code) {
-  return authCodes.get(code) || null;
+  return authCodes.get(code) || {};
 }
 
 function deleteAuthCode(code) {
@@ -63,7 +63,7 @@ function saveAccessToken(token, accessToken) {
 }
 
 function getAccessToken(token) {
-  return accessTokens.get(token) || null;
+  return accessTokens.get(token) || {};
 }
 
 function deleteAccessToken(token) {
@@ -76,7 +76,7 @@ function savePendingAuthorizeRequest(id, request) {
 }
 
 function getPendingAuthorizeRequest(id) {
-  return pendingAuthorizeRequests.get(id) || null;
+  return pendingAuthorizeRequests.get(id) || {};
 }
 
 function deletePendingAuthorizeRequest(id) {
@@ -89,7 +89,7 @@ function saveFakeLoginSession(id, session) {
 }
 
 function getFakeLoginSession(id) {
-  return fakeLoginSessions.get(id) || null;
+  return fakeLoginSessions.get(id) || {};
 }
 
 function deleteFakeLoginSession(id) {

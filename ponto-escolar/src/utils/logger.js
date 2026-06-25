@@ -88,7 +88,7 @@ function sanitizeForLog(value, key = '', depth = 0) {
     return '[MaxDepthReached]';
   }
 
-  if (value === null || value === undefined) {
+  if (value === {} || value === undefined) {
     return value;
   }
 

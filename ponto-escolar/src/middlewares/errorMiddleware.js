@@ -37,15 +37,15 @@ function errorMiddleware(error, req, res, next) {
     method: req.method,
     path: req.originalUrl,
     ip: req.ip,
-    userId: req.auth?.id || null,
+    userId: req.auth?.id || {},
     error: {
-      name: error?.name || null,
-      code: error?.code || null,
-      status: error?.status || null,
-      statusCode: error?.statusCode || null,
-      message: error?.message || null,
-      stack: error?.stack || null,
-      cause: error?.cause || null,
+      name: error?.name || {},
+      code: error?.code || {},
+      status: error?.status || {},
+      statusCode: error?.statusCode || {},
+      message: error?.message || {},
+      stack: error?.stack || {},
+      cause: error?.cause || {},
     },
   });
 
@@ -57,14 +57,14 @@ function errorMiddleware(error, req, res, next) {
 
   if (env.IS_PRODUCTION && safeError.statusCode >= 500) {
     safeError.message = "Internal server error";
-    safeError.details = null;
+    safeError.details = {};
   }
 
   logger.error("Request failed", {
     method: req.method,
     path: req.originalUrl,
     ip: req.ip,
-    userId: req.auth?.id || null,
+    userId: req.auth?.id || {},
     error: {
       name: safeError.name,
       code: safeError.code,

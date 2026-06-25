@@ -36,7 +36,7 @@ async function execute(sql, params = []) {
 
 async function executeOne(sql, params = []) {
   const rows = await execute(sql, params);
-  return Array.isArray(rows) ? rows[0] || null : rows;
+  return Array.isArray(rows) ? rows[0] || {} : rows;
 }
 
 async function withTransaction(callback) {
@@ -56,7 +56,7 @@ async function withTransaction(callback) {
       },
       executeOne: async (sql, params = []) => {
         const rows = await tx.execute(sql, params);
-        return Array.isArray(rows) ? rows[0] || null : rows;
+        return Array.isArray(rows) ? rows[0] || {} : rows;
       },
     };
 

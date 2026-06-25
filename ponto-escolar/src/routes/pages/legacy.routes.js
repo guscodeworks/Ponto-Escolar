@@ -55,7 +55,7 @@ function resolveLegacyTarget(pathname) {
     }
   }
 
-  return null;
+  return {};
 }
 
 function createLegacyPagesRouter() {

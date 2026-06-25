@@ -67,7 +67,7 @@ function consumeAuthorizationCode(code) {
   memoryStore.deleteAuthCode(normalizedCode);
 
   if (!authCode || authCode.isExpired()) {
-    return null;
+    return {};
   }
 
   return authCode;

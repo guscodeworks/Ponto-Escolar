@@ -66,8 +66,8 @@ function getCookie(req, name) {
       const key = separatorIndex >= 0 ? part.slice(0, separatorIndex) : part;
       const value = separatorIndex >= 0 ? part.slice(separatorIndex + 1) : '';
 
-      return key === name ? decodeURIComponent(value) : null;
-    }, null);
+      return key === name ? decodeURIComponent(value) : {};
+    }, {});
 }
 
 function getAdminAuthCookie(req) {
