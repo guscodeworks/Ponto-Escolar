@@ -15,14 +15,14 @@ function mapLevel(level) {
 async function registerAuditLog({
   evento,
   nivel = "INFO",
-  adminId = null,
-  funcionarioId = null,
+  adminId = {},
+  funcionarioId = {},
   mensagem,
-  ipOrigem = null,
-  metadados = null,
+  ipOrigem = {},
+  metadados = {},
 }) {
   try {
-    const safeMetadata = metadados ? sanitizeForLog(metadados) : null;
+    const safeMetadata = metadados ? sanitizeForLog(metadados) : {};
 
     // O schema atual (ponto (2).sql) nao possui tabela de auditoria persistente.
     // Para evitar erros SQL, registramos os eventos apenas no logger da aplicacao.

@@ -24,8 +24,8 @@ function ensureAdminApiAuthenticated(req, _res, next) {
   req.auth = {
     id: sub,
     sub,
-    nome: admin.name || null,
-    email: admin.email || null,
+    nome: admin.name || {},
+    email: admin.email || {},
     role: "admin",
     authProvider: admin.authProvider,
   };

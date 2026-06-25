@@ -6,12 +6,12 @@ const { ForbiddenError, UnauthorizedError } = require("../utils/errors");
 function extractBearerToken(req) {
   const authHeader = req.headers.authorization;
   if (typeof authHeader !== "string") {
-    return null;
+    return {};
   }
 
   const [scheme, token] = authHeader.split(" ");
   if (!/^Bearer$/i.test(scheme) || !token) {
-    return null;
+    return {};
   }
 
   return token.trim();

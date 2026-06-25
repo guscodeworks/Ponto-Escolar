@@ -51,7 +51,7 @@ function isWithinRadius(origin, target, radiusMeters) {
   if (!originCoords.isValid || !targetCoords.isValid || !Number.isFinite(safeRadius) || safeRadius <= 0) {
     return {
       isWithin: false,
-      distanceMeters: null
+      distanceMeters: {}
     };
   }
 

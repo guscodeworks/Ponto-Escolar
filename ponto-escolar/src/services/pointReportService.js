@@ -41,7 +41,7 @@ function resolveReportDate(value) {
 
 function toDateTime(date, time) {
   if (!hasPunchTime(time)) {
-    return null;
+    return {};
   }
 
   return `${date} ${normalizeTimeValue(time)}`;
@@ -139,7 +139,7 @@ async function buildDailySnapshot(date) {
   const summaries = employees.map((employee) =>
     summarizeEmployeeDay(
       employee,
-      byEmployee.get(Number(employee.id)) || null,
+      byEmployee.get(Number(employee.id)) || {},
       date
     )
   );

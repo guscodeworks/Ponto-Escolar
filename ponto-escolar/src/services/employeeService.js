@@ -22,7 +22,7 @@ function mapEmployee(employee) {
     criado_em: employee.criado_em,
     primeiro_acesso: Boolean(employee.primeiro_acesso),
     cargo_id: employee.cargo_id,
-    cargo_nome: employee.cargo_nome || null,
+    cargo_nome: employee.cargo_nome || {},
     login_id: employee.login_id,
   };
 }
@@ -52,7 +52,7 @@ async function createEmployee(body, { adminId, ipOrigem } = {}) {
     .toLowerCase();
   const senha = String(body.senha || "");
   const ativo = body.ativo === undefined ? true : Boolean(body.ativo);
-  const requestedCargoId = body.cargo_id ? Number(body.cargo_id) : null;
+  const requestedCargoId = body.cargo_id ? Number(body.cargo_id) : {};
   const senhaHash = await bcrypt.hash(senha, 12);
 
   const employeeId = await employeeModel.withTransaction(async (tx) => {

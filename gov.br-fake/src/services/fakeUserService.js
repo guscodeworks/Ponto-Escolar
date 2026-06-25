@@ -20,7 +20,7 @@ function normalizeSub(value) {
 }
 
 function findBySub(sub) {
-  return fakeUsersBySub.get(normalizeSub(sub)) || null;
+  return fakeUsersBySub.get(normalizeSub(sub)) || {};
 }
 
 function authenticate({ sub, password }) {
@@ -28,7 +28,7 @@ function authenticate({ sub, password }) {
   const receivedPassword = String(password || '');
 
   if (!user || user.password !== receivedPassword) {
-    return null;
+    return {};
   }
 
   return user;
@@ -37,7 +37,7 @@ function authenticate({ sub, password }) {
 function toUserInfo(user) {
   return user && typeof user.toUserInfo === 'function'
     ? user.toUserInfo()
-    : null;
+    : {};
 }
 
 module.exports = {

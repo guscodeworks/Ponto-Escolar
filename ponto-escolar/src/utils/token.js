@@ -71,8 +71,8 @@ function isActiveQrToken(tokenRecord) {
   }
 
   const isActive = Boolean(tokenRecord.ativo ?? tokenRecord.active ?? false);
-  const usedAt = tokenRecord.usado_em ?? tokenRecord.usedAt ?? null;
-  const expiresAt = tokenRecord.expira_em ?? tokenRecord.expiresAt ?? null;
+  const usedAt = tokenRecord.usado_em ?? tokenRecord.usedAt ?? {};
+  const expiresAt = tokenRecord.expira_em ?? tokenRecord.expiresAt ?? {};
 
   if (!isActive || usedAt) {
     return false;
@@ -83,7 +83,7 @@ function isActiveQrToken(tokenRecord) {
 
 function tokenFingerprint(token) {
   if (!isValidTokenFormat(token)) {
-    return null;
+    return {};
   }
   return hashToken(token).slice(0, 12);
 }

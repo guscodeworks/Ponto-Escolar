@@ -8,7 +8,7 @@ function getClientIp(req) {
   return (
     req.headers['x-forwarded-for']?.split(',')?.[0]?.trim() ||
     req.ip ||
-    null
+    {}
   );
 }
 
@@ -16,7 +16,7 @@ function getClientIp(req) {
  * Extrai e trunca o User-Agent da requisição.
  */
 function getClientUserAgent(req) {
-  return String(req.headers['user-agent'] || '').slice(0, 255) || null;
+  return String(req.headers['user-agent'] || '').slice(0, 255) || {};
 }
 
 module.exports = { getClientIp, getClientUserAgent };
