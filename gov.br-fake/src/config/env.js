@@ -5,7 +5,7 @@ const dotenv = require("dotenv");
 dotenv.config({ quiet: true });
 
 const DEFAULT_PORT = "4000";
-const DEFAULT_HOST = "localhost";
+const DEFAULT_HOST = "0.0.0.0";
 
 function parsePort(value) {
   const raw = String(value || DEFAULT_PORT).trim();
@@ -31,11 +31,11 @@ const env = Object.freeze({
   ).trim(),
   pontoEscolarRedirectUri: String(
     process.env.PONTO_ESCOLAR_REDIRECT_URI ||
-      "http://localhost:3000/auth/govbr/callback"
+      "http://127.0.0.1:3000/auth/govbr/callback"
   ).trim(),
   pontoEscolarStartUrl: String(
     process.env.PONTO_ESCOLAR_START_URL ||
-      "http://localhost:3000/auth/govbr/login"
+      "http://127.0.0.1:3000/auth/govbr/login"
   ).trim(),
   fakeAdminSub: String(
     process.env.GOVBR_FAKE_ADMIN_SUB || "admin-local-001"

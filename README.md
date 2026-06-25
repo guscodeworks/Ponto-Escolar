@@ -298,12 +298,16 @@ npm start
 
 Endereços padrão da configuração local:
 
-- sistema principal: `http://localhost:3000`;
-- dashboard administrativo: `http://localhost:3000/admin/dashboard`;
-- início do fluxo administrativo: `http://localhost:3000/auth/govbr/login`;
-- simulador: `http://localhost:4000/govbr`;
-- health check principal: `http://localhost:3000/health`;
-- health check do simulador: `http://localhost:4000/health`.
+- sistema principal: `http://127.0.0.1:3000`;
+- dashboard administrativo: `http://127.0.0.1:3000/admin/dashboard`;
+- início do fluxo administrativo: `http://127.0.0.1:3000/auth/govbr/login`;
+- simulador: `http://127.0.0.1:4000/govbr`;
+- health check principal: `http://127.0.0.1:3000/health`;
+- health check do simulador: `http://127.0.0.1:4000/health`.
+
+No Docker, os servidores fazem bind em `0.0.0.0` para receber o
+encaminhamento das portas publicadas. Use `127.0.0.1`, e não `0.0.0.0`, nas
+URLs abertas no navegador, nos redirects e no callback OAuth.
 
 ### Opção 2: execução conjunta
 
