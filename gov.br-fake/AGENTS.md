@@ -80,7 +80,7 @@ O botão `Gerenciar pontos` não deve chamar diretamente:
 O correto é iniciar o fluxo pelo `ponto-escolar`, normalmente em:
 
 ```txt
-http://localhost:3000/auth/govbr/login
+http://127.0.0.1:3000/auth/govbr/login
 ```
 
 Assim o `ponto-escolar` cria e controla:

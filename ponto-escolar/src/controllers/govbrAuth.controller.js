@@ -19,7 +19,7 @@ const { buildClearAdminAuthCookie } = require("../utils/authCookie");
 
 function getGovbrFakeLogoutUrl() {
   const baseUrl = String(
-    process.env.GOVBR_FAKE_BASE_URL || "http://localhost:4000"
+    process.env.GOVBR_FAKE_BASE_URL || "http://127.0.0.1:4000"
   )
     .trim()
     .replace(/\/+$/, "");

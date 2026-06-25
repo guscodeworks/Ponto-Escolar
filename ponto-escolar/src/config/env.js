@@ -2,7 +2,7 @@ const dotenv = require("dotenv");
 
 dotenv.config({ quiet: true });
 
-const DEFAULT_GOVBR_FAKE_BASE_URL = "http://localhost:4000";
+const DEFAULT_GOVBR_FAKE_BASE_URL = "http://127.0.0.1:4000";
 const GOVBR_CALLBACK_PATH = "/auth/govbr/callback";
 const LEGACY_GOVBR_CALLBACK_PATH = "/admin/auth/callback";
 
@@ -263,6 +263,7 @@ requireAtLeastOneAdminIdentifier(adminSubs, adminEmails);
 const env = {
   NODE_ENV,
   IS_PRODUCTION,
+  HOST: getOptionalVar("HOST", "0.0.0.0"),
   PORT: parseInteger(getRequiredVar("PORT"), "PORT", 1, 65535),
   DB_HOST: getRequiredVar("DB_HOST"),
   DB_PORT: parseInteger(getOptionalVar("DB_PORT", "3306"), "DB_PORT", 1, 65535),

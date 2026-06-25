@@ -7,7 +7,7 @@ const { checkConnection } = require("./src/config/database");
 async function startServer() {
   try {
     await checkConnection();
-    app.listen(env.PORT, () => {
+    app.listen(env.PORT, env.HOST, () => {
       console.log(`Servidor iniciado na porta ${env.PORT}.`);
     });
   } catch (error) {
