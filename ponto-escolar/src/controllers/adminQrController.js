@@ -6,15 +6,43 @@ const {
   validateQrCode,
 } = require("../services/qrCodeService");
 const { registerAuditLog } = require("../services/auditLogService");
+const env = require("../config/env");
 
 function getClientIp(req) {
-  return (
-    req.headers["x-forwarded-for"]?.split(",")?.[0]?.trim() || req.ip || null
-  );
+  return req.ip || null;
+}
+
+function getConfiguredBaseUrl() {
+  const rawBaseUrl = String(
+    process.env.PUBLIC_BASE_URL || process.env.APP_BASE_URL || ""
+  ).trim();
+
+  if (!rawBaseUrl) {
+    return "";
+  }
+
+  try {
+    const url = new URL(rawBaseUrl);
+    if (env.IS_PRODUCTION && url.protocol !== "https:") {
+      return "";
+    }
+    return url.toString().replace(/\/+$/, "");
+  } catch (_error) {
+    return "";
+  }
 }
 
 function getBaseUrl(req) {
-  const protocol = req.headers["x-forwarded-proto"] || req.protocol || "http";
+  const configuredBaseUrl = getConfiguredBaseUrl();
+  if (configuredBaseUrl) {
+    return configuredBaseUrl;
+  }
+
+  if (env.IS_PRODUCTION) {
+    return "";
+  }
+
+  const protocol = req.protocol || "http";
   const host = req.get("host");
   return host ? `${protocol}://${host}` : "";
 }
@@ -23,7 +51,7 @@ async function generateQrShortcut(req, res, next) {
   try {
     const qrCode = await createQrCode({
       adminId: req.auth.id,
-      unidadeCodigo: req.body.unidade_codigo,
+      unidadeCodigo: env.SCHOOL_UNIT_CODE,
       baseUrl: getBaseUrl(req),
     });
 
@@ -104,7 +132,7 @@ async function validateQrShortcut(req, res, next) {
       req.body.qrCode || req.body.qr_code || req.body.qrToken || ""
     ).trim();
     const validation = await validateQrCode(qrCodeValue, {
-      unidadeCodigo: req.body.unidade_codigo,
+      unidadeCodigo: env.SCHOOL_UNIT_CODE,
     });
 
     if (!validation.valid) {

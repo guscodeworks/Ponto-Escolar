@@ -175,6 +175,7 @@ async function concluirLoginGovbr(req, res, next) {
 
 async function sairGovbr(req, res, next) {
   res.setHeader("Set-Cookie", buildClearAdminAuthCookie());
+  res.clearCookie("ponto_escolar_sid", { path: "/" });
   res.clearCookie("connect.sid", { path: "/" });
 
   if (!req.session) {

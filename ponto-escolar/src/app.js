@@ -10,6 +10,7 @@ const govbrAuthRoutes = require("./routes/govbrAuth.routes");
 const apiRoutes = require("./routes");
 const { createPagesRouter } = require("./routes/pages.routes");
 const punchRoutes = require("./routes/punchRoutes");
+const { validateQrCode } = require("./services/qrCodeService");
 const { globalLimiter } = require("./middlewares/rateLimiters");
 const { notFoundMiddleware } = require("./middlewares/notFoundMiddleware");
 const { errorMiddleware } = require("./middlewares/errorMiddleware");
@@ -38,7 +39,7 @@ function isAllowedOrigin(origin) {
 }
 
 app.disable("x-powered-by");
-app.set("trust proxy", 1);
+app.set("trust proxy", env.IS_PRODUCTION ? 1 : false);
 
 app.use(
   helmet({
@@ -53,7 +54,11 @@ app.use(
 );
 
 function getRequestHost(req) {
-  return String(req.headers["x-forwarded-host"] || req.get("host") || "")
+  const host = env.IS_PRODUCTION
+    ? req.headers["x-forwarded-host"] || req.get("host")
+    : req.get("host");
+
+  return String(host || "")
     .split(",")[0]
     .trim()
     .toLowerCase();
@@ -116,14 +121,15 @@ app.use(express.json({ limit: "100kb" }));
 app.use(express.urlencoded({ extended: false, limit: "100kb" }));
 app.use(
   session({
+    name: 'ponto_escolar_sid',
     secret: env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      sameSite: "lax",
-      secure: env.IS_PRODUCTION,
-    },
+      sameSite: 'lax',
+      secure: env.IS_PRODUCTION
+    }
   })
 );
 app.use(globalLimiter);
@@ -161,7 +167,14 @@ function sendView(res, relativePath) {
   res.sendFile(path.join(viewsRoot, relativePath));
 }
 
-app.use(createPagesRouter({ sendView }));
+app.use(
+  createPagesRouter({
+    sendView,
+    validateQrCode,
+    schoolUnitCode: env.SCHOOL_UNIT_CODE,
+    noCacheHtmlHeaders,
+  })
+);
 
 app.use("/ponto", punchRoutes);
 app.use("/api", apiRoutes);

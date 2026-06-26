@@ -36,6 +36,11 @@ function resolveReportDate(value) {
     throw new BadRequestError("Data invalida. Use o formato YYYY-MM-DD");
   }
 
+  const parsed = new Date(`${date}T00:00:00.000Z`);
+  if (Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== date) {
+    throw new BadRequestError('Data invalida. Use uma data real no formato YYYY-MM-DD');
+  }
+
   return date;
 }
 

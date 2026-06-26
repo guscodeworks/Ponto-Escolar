@@ -6,9 +6,13 @@ const { BadRequestError, UnauthorizedError } = require("../utils/errors");
 const { registerAuditLog } = require("../services/auditLogService");
 
 function getClientIp(req) {
+<<<<<<< HEAD
+  return req.ip || null;
+=======
   return (
     req.headers["x-forwarded-for"]?.split(",")?.[0]?.trim() || req.ip || null
   );
+>>>>>>> 705dbbabe53cc90e5ba85259f8a91f61b02fc21a
 }
 
 async function loginAdmin(req, res, next) {
